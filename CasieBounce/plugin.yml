@@ -1,0 +1,23 @@
+name: CasieBounce
+author: CasieBarie
+version: 3.2
+description: Bounce!
+api-version: 1.13
+main: me.casiebarie.casiebounce.Main
+softdepend: [WorldGuard]
+
+commands:
+   CB:
+      description: Command of CasieBounce.
+
+permissions:
+   CB.*:
+      description: All permissioms.
+      children:
+         CB.admin: true
+         CB.bounce: true
+   CB.admin:
+      description: Allows you to reload the config.
+   CB.bounce:
+      description: Allows you to bounce!
+      default: op
