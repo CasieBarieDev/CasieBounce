@@ -15,7 +15,7 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		saveDefaultConfig();
 		worldGuardPlugin = getWorldGuard();
-		//Version Checker
+		//Version Check
 		final String BukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
 		final List<String> LegacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
 		final List<String> Versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3");
@@ -27,11 +27,11 @@ public class Main extends JavaPlugin {
 		}
 		new CBCommand(this);
 		getCommand("CB").setTabCompleter(new CBTabCompleter());
-		//Worldguard Checker
+		//Worldguard Check
 		if(worldGuardPlugin == null) {
 			this.getLogger().info("WorldGuard not found, regions disabled!");
 		} else {this.getLogger().info("WorldGuard found!");}
-		//Update Checker
+		//Update Check
 		new UpdateChecker(this, 90967).getVersion(version -> {
 			if(this.getDescription().getVersion().equalsIgnoreCase(version)) {
 				this.getLogger().info("You are using the most recent version. (v" + this.getDescription().getVersion() + ")");

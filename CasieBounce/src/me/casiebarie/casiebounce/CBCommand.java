@@ -33,7 +33,6 @@ public class CBCommand implements CommandExecutor{
 		plugin.getCommand("CB").setExecutor(this);
 		getconfig(null);
 	}
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("CB")) {

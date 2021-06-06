@@ -18,5 +18,5 @@ permissions:
       description: Allows you to reload the config.
       default: op
    CB.bounce:
-      description: Allows you to bounce!
+      description: Allows you to bounce.
       default: op

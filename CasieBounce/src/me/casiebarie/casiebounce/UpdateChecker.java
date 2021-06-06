@@ -5,8 +5,8 @@ import org.bukkit.util.Consumer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Scanner;
+import java.net.URL;
 
 public class UpdateChecker {
 	private Main plugin;

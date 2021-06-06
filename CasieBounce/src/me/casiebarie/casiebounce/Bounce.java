@@ -29,7 +29,6 @@ public class Bounce implements Listener{
 	public Main plugin;
 	private ArrayList<UUID> isBouncing = new ArrayList<>();
 	private ArrayList<UUID> canDie = new ArrayList<>();
-	
 	public Bounce(Main plugin) {
 		this.plugin = plugin;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
