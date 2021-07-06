@@ -131,8 +131,8 @@ public class CBCommand implements CommandExecutor, Listener{
 			if(check.get(4).equals(true)) {sender.sendMessage(color("&cThe config section 'RequirePermission' can not be validated! &8(Type: Boolean)"));}
 			if(check.get(5).equals(true)) {sender.sendMessage(color("&cThe config section 'IsRegionBlacklist' can not be validated! &8(Type: Boolean)"));}
 			if(check.get(6).equals(true)) {sender.sendMessage(color("&cThe config section 'IsBlockBlacklist' can not be validated! &8(Type: Boolean)"));}
-			if(check.get(7).equals(true)) {sender.sendMessage(color("&cThe config section 'FallDamage' can not be validated! &8(Type: Boolean)"));}
-			if(check.get(8).equals(true)) {sender.sendMessage(color("&cThe 'BounceSound' " + config.getString(".BounceSound") + " doesn't exist!"));}
+			if(check.get(7).equals(true)) {sender.sendMessage(color("&cThe config section 'FallDamage' can not be validated! &8(Use: 'ENABLED', 'DISABLED' or 'REDUCED')"));}
+			if(check.get(8).equals(true)) {sender.sendMessage(color("&cThe 'BounceSound' " + config.get(".BounceSound") + " doesn't exist!"));}
 			if(check.get(9).equals(true)) {sender.sendMessage(color("&cThe 'BounceBlocks' " + invalidBlocks + " are not recognized!"));}
 			if(isCommand && sender instanceof Player) {sender.sendMessage(color("&c-----------------------------------------------------&r"));}
 			else {sender.sendMessage(color("&c-------------------------------------------------------------------"));}

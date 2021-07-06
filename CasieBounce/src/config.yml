@@ -15,7 +15,7 @@ BounceSound: BLOCK_SLIME_HIT
 # Whether you will stop bouncing when you crouch.
 StopWhenCrouch: true
 
-# Whether you take FallDamage.
+# Whether you take FallDamage. Use: 'ENABLED', 'DISABLED' or 'REDUCED'
 FallDamage: DISABLED
 # The death message. (Color codes supported)
 DeathMessage: '%player% fell while bouncing'
