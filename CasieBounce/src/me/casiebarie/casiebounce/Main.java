@@ -4,33 +4,37 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
-public class Main extends JavaPlugin {
+public class Main extends JavaPlugin implements Listener{
 	public WorldGuardPlugin worldGuardPlugin;
+	public static boolean canBounce;
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 		worldGuardPlugin = getWorldGuard();
+
 		//Version Check
 		final String BukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
 		final List<String> LegacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
-		final List<String> Versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3");
+		final List<String> Versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3", "1_17_R1", "1_17_R2");
 		if(LegacyVersions.contains(BukkitVersion)) {new BounceLegacy(this);
 		} else if (Versions.contains(BukkitVersion)) {new Bounce(this);
 		} else {
-			Bukkit.getLogger().warning("Incompatible version. Disabling plugin");
+			getLogger().severe("Incompatible version. Disabling plugin");
 			getServer().getPluginManager().disablePlugin(this);
 		}
 		new CBCommand(this);
 		getCommand("CB").setTabCompleter(new CBTabCompleter());
+
 		//Worldguard Check
-		if(worldGuardPlugin == null) {
-			this.getLogger().info("WorldGuard not found, regions disabled!");
+		if(worldGuardPlugin == null) {getLogger().warning("WorldGuard not found, regions disabled!");
 		} else {this.getLogger().info("WorldGuard found!");}
+
 		//Update Check
 		new UpdateChecker(this, 90967).getVersion(version -> {
 			if(this.getDescription().getVersion().equalsIgnoreCase(version)) {

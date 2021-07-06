@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
 public class CBTabCompleter implements TabCompleter{
-	public enum complete {reloadconfig, info}
+	public enum complete {reloadconfig, info, geterror}
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		java.util.List<String> completions = new ArrayList<>();
@@ -17,11 +17,12 @@ public class CBTabCompleter implements TabCompleter{
 			if(args.length == 1) {
 				if(!args[0].equals("")) {
 					for(complete modes : complete.values()) {
-						if(modes.name().toUpperCase().startsWith(args[0].toUpperCase())) {completions.add(modes.name());}
+						if(modes.name().toUpperCase().startsWith(args[0].toUpperCase())) {completions.add(modes.name());}	
 					}
 				} else {for(complete modes : complete.values()) {completions.add(modes.name());}}
 			}
 		}
+		if(Main.canBounce) {completions.remove("geterror");}
 		Collections.sort(completions);
 		return completions;
 	}

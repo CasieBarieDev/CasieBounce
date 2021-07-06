@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -14,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
@@ -37,7 +37,7 @@ public class BounceLegacy implements Listener{
 		Player player = e.getPlayer();
 		Block block = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
 		List<Boolean> isInConfig = new ArrayList<Boolean>();
-		if(block.getType() == Material.AIR){return;}
+		if(!Main.canBounce) {return;}
 		if(CBCommand.requirePermission && !player.hasPermission("CB.bounce")){return;}
 		if(player.isSneaking() && CBCommand.stopWhenCrouch){return;}
 		for(int i = 0; i < CBCommand.bounceBlockTypes.size(); i++ ) {
@@ -91,7 +91,8 @@ public class BounceLegacy implements Listener{
 		} return;
 	}
 	public void goBounce(Player player) {
-		player.setVelocity(new Vector(0,CBCommand.bounceForge,0));
+		player.setVelocity(new Vector(0,CBCommand.bounceForce,0));
+		player.setFallDistance(0);
 		if(!isBouncing.contains(player.getUniqueId())){
 			try {player.playSound(player.getLocation(), Sound.valueOf(CBCommand.bounceSound), 1f, 1f);
 			} catch (Exception e) {}
@@ -99,15 +100,29 @@ public class BounceLegacy implements Listener{
 		}
 	}
 	@EventHandler
+	public void onPlayerDamage(EntityDamageEvent e) {
+		if(!(e.getEntity() instanceof Player)) {return;}
+		Player player = (Player) e.getEntity();
+		if(e.getCause() != DamageCause.FALL) {return;}
+		canDie.remove(player.getUniqueId());
+		if(isBouncing.contains(player.getUniqueId())) {
+			canDie.add(player.getUniqueId());
+			double fallDistance = player.getFallDistance() - (CBCommand.bounceForce * 10);
+			if(CBCommand.fallDamage.equals("DISABLED")) {e.setCancelled(true);}
+			if(CBCommand.fallDamage.equals("REDUCED")) {
+				if(fallDistance <= 3) {e.setCancelled(true);
+				} else {e.setDamage((fallDistance * 0.5) + 0.5);}
+			}
+		}
+	}
+	@EventHandler
 	public void onPlayerLand(PlayerMoveEvent e) {
 		Player player = e.getPlayer();
-		if(e.getFrom().getBlockY() > e.getTo().getBlockY()) {
-			canDie.remove(player.getUniqueId());
-			if(isBouncing.contains(player.getUniqueId())) {
-				if(!e.getTo().getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.AIR)) {
-					isBouncing.remove(player.getUniqueId());
-					canDie.add(player.getUniqueId());}
-				if(!CBCommand.fallDamage) {player.setFallDistance((float) - CBCommand.bounceForge);}
+		if(isBouncing.contains(player.getUniqueId())) {
+			if(player.getFallDistance() > 0) {
+				Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+					public void run() {if(player.getFallDistance() == 0) {isBouncing.remove(player.getUniqueId());}}
+				}, 1l);
 			}
 		}
 	}

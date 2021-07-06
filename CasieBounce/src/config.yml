@@ -9,14 +9,14 @@
 # How high you will bounce, just experiment with it :)
 Bounceforce: 0.7
 
-#The sound that will be played when you bounce.
+#The sound that will be played when you bounce. (Set to NONE to disable)
 BounceSound: BLOCK_SLIME_HIT
 
 # Whether you will stop bouncing when you crouch.
 StopWhenCrouch: true
 
 # Whether you take FallDamage.
-FallDamage: false
+FallDamage: DISABLED
 # The death message. (Color codes supported)
 DeathMessage: '%player% fell while bouncing'
 
@@ -25,7 +25,7 @@ RequirePermission: false
 
 # The names of the WorldGuard regions. (Only works when WorldGuard is installed {Use GLOBAL to make it work everywhere, make sure when you use GLOBAL to not specify other regions})
 Regions:
-   - regionname
+   - GLOBAL
 # If the regionlist above is a blacklist. When true you can bounce in every region exept the ones above. (GLOBAL will disable the bouncing)
 IsRegionBlacklist: false
 
