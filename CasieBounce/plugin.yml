@@ -1,6 +1,7 @@
 name: CasieBounce
 author: CasieBarie
-version: 4.2
+website: https://www.casiebariedev.ga/
+version: 5.0
 description: Bounce!
 api-version: 1.13
 main: me.casiebarie.casiebounce.Main
@@ -10,7 +11,7 @@ commands:
       description: Command of CasieBounce.
 permissions:
    CB.*:
-      description: All permissioms.
+      description: All permissions.
       children:
          CB.admin: true
          CB.bounce: true
