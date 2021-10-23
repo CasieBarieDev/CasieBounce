@@ -29,30 +29,32 @@ public class Messages implements Listener {
 	
 	@SuppressWarnings("deprecation")
 	public void info(CommandSender sender) {
-		sender.spigot().sendMessage(new ComponentBuilder("----------------- ").color(ChatColor.GOLD)
-				.append("CasieBounce").color(ChatColor.AQUA).bold(true).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("By: ").color(ChatColor.BLUE).append("CasieBarie").color(ChatColor.YELLOW).create()))
-				.append(" -----------------").color(ChatColor.GOLD).bold(false).event((HoverEvent) null)
-				.append("\n\nBefore you start you've to make sure you set the 'WorldGuardFlags' in the correct state. If you don't use WorldGuard you can edit the settings in the config. Use ").color(ChatColor.DARK_AQUA).bold(false)
-				.append("/cb ReloadConfig").color(ChatColor.YELLOW).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/cb ReloadConfig").color(ChatColor.GREEN).create())).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb ReloadConfig"))
-				.append(" to reload the config. Any errors in the config will be announced. \nIf you use WorldGuard type ").color(ChatColor.DARK_AQUA).bold(false).event((HoverEvent) null).event((ClickEvent) null)
-				.append("/cb Info WorldGuardFlags").color(ChatColor.YELLOW).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/cb Info WorldGuardFlags").color(ChatColor.GREEN).create())).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb Info WorldGuardFlags"))
-				.append(" to see info about the WorldGuard flags that are used to define the settings").color(ChatColor.DARK_AQUA).bold(false).event((HoverEvent) null).event((ClickEvent) null)
-				.append("\n\nHave fun with bouncing!").color(ChatColor.DARK_AQUA).bold(false)
-				.append("\n------------------------------------------------").color(ChatColor.GOLD).bold(false)
+		sender.spigot().sendMessage(new ComponentBuilder("§6----------------- ").append("§b§lCasieBounce").event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§9By: §eCasieBarie").create())).append("§6 -----------------").event((HoverEvent) null)
+				.append("\n\n§3Before you start you've to make sure you set the '§7WorldGuardFlags§3' in the config to the correct state. If you don't use WorldGuard you can edit the settings in the config. Use '")
+				.append("§e/cb ReloadConfig").event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§a/cb ReloadConfig").create())).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb ReloadConfig"))
+				.append("§3' to reload the config. Any errors in the config will be announced. \n\nIf you use WorldGuard type '").event((HoverEvent) null).event((ClickEvent) null)
+				.append("§e/cb Info WorldGuardFlags").event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§a/cb Info WorldGuardFlags").create())).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb Info WorldGuardFlags"))
+				.append("§3' to see info about the WorldGuard flags that are used to define the settings.").event((HoverEvent) null).event((ClickEvent) null)
+				.append("\n\n§3More support at: ").event((ClickEvent) null).event((HoverEvent) null)
+				.append("\n§e§nSPIGOT").event(new ClickEvent(Action.OPEN_URL, "https://www.spigotmc.org/resources/.90967")).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7https://www.spigotmc.org/resources/.90967").create()))
+				.append(" §3| ").event((ClickEvent) null).event((HoverEvent) null)
+				.append("§b§nDISCORD").event(new ClickEvent(Action.OPEN_URL, "https://discord.gg/ZptCBHeHyg")).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7https://discord.gg/ZptCBHeHyg").create()))
+				.append(" §3| ").event((ClickEvent) null).event((HoverEvent) null)
+				.append("§4§nWEBSITE").event(new ClickEvent(Action.OPEN_URL, "https://www.casiebariedev.ga/")).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7https://www.casiebariedev.ga/").create()))
+				.append(" §3| ").event((ClickEvent) null).event((HoverEvent) null)
+				.append("§f§nGITHUB").event(new ClickEvent(Action.OPEN_URL, "https://github.com/CasieBarieDev/CasieBounce")).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7https://github.com/CasieBarieDev/CasieBounce").create()))
+				.append("\n§6------------------------------------------------")
 				.create());
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void WorldGuardInfo(CommandSender sender) {
-		sender.spigot().sendMessage(new ComponentBuilder("----------------- ").color(ChatColor.GOLD).bold(false)
-				.append("CasieBounce").color(ChatColor.AQUA).bold(true).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("By: ").color(ChatColor.BLUE).append("CasieBarie").color(ChatColor.YELLOW).create()))
-				.append(" -----------------").color(ChatColor.GOLD).bold(false).event((HoverEvent) null)
-				.append("\nTo enable CasieBounce in you're region you've to put the flag ").color(ChatColor.DARK_AQUA).bold(false)
-				.append("CB-ENABLED").color(ChatColor.LIGHT_PURPLE).bold(false).append(" to ").color(ChatColor.DARK_AQUA).bold(false).append("true").color(ChatColor.YELLOW).bold(false)
-				.append(" in that region. After that you can specify the settings using the following flags:").color(ChatColor.DARK_AQUA).bold(false)
-				.append("\n\n* cb-stopwhencrouch\n* cb-requirepermission\n* cb-bounceforce\n* cb-bouncesound\n* cb-falldamage\n* cb-deathmessage\n* cb-bounceblocks\n* cb-isblockblacklist").color(ChatColor.LIGHT_PURPLE).bold(false)
-				.append("\n\nIf a setting is not set in the region. The setting will default to the value that is set in the config.").color(ChatColor.DARK_AQUA).bold(false)
-				.append("\n------------------------------------------------").color(ChatColor.GOLD).bold(false)
+		sender.spigot().sendMessage(new ComponentBuilder("§6----------------- ").append("§b§lCasieBounce").event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§9By: §eCasieBarie").create())).append("§6 -----------------").event((HoverEvent) null)
+				.append("\n§3To enable CasieBounce in you're region you've to put the flag ")
+				.append("§dCB-ENABLED §3to §etrue §3in that region. After that you can specify the settings using the following flags:")
+				.append("\n\n§d* cb-stopwhencrouch * cb-requirepermission * cb-bounceforce \n* cb-bouncesound * cb-falldamage * cb-deathmessage\n* cb-bounceblocks * cb-isblockblacklist")
+				.append("\n\n§3If a setting is not set in the region. The setting will default to the value that is set in the config. Be aware that the plugin gets the FallDamage and DeathMessage settings from the region the player is landing in. So if you start bouncing in a region where FallDamage is disabled and you land in a region where it is enabled, you will still get falldamage.")
+				.append("\n§6------------------------------------------------")
 				.create());
 	}
 	
@@ -60,20 +62,18 @@ public class Messages implements Listener {
 	public void regionInfo(CommandSender sender) {
 		if(!plugin.wgEnabled) {send(sender, "&6[&bCasieBounce&6] &cWorldGuard is not enabled!"); return;}
 		ArrayList<Object> regionSettings = regionManager.getRegionSettings((Player) sender);
-		sender.spigot().sendMessage(new ComponentBuilder("----------------- ").color(ChatColor.GOLD)
-				.append("CasieBounce").color(ChatColor.AQUA).bold(true).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("By: ").color(ChatColor.BLUE).append("CasieBarie").color(ChatColor.YELLOW).create()))
-				.append(" -----------------").color(ChatColor.GOLD).bold(false).event((HoverEvent) null)
-				.append("\nRegion Settings:").color(ChatColor.DARK_AQUA).underlined(true)
-				.append("\n\n* Enabled: ").color(ChatColor.DARK_PURPLE).underlined(false).append("" + regionSettings.get(0)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* StopWhenCrouch: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(1)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* RequirePermission: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(2)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* BounceForce: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(3)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* BounceSound: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(4)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* FallDamage: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(5)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* DeathMessage: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(6)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* BounceBlocks: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(8)).color(ChatColor.YELLOW).italic(true)
-				.append("\n* IsBlockBlacklist: ").color(ChatColor.DARK_PURPLE).italic(false).append("" + regionSettings.get(7)).color(ChatColor.YELLOW).italic(true)
-				.append("\n------------------------------------------------").color(ChatColor.GOLD).italic(false)
+		sender.spigot().sendMessage(new ComponentBuilder("§6----------------- ").append("§b§lCasieBounce").event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§9By: §eCasieBarie").create())).append("§6 -----------------").event((HoverEvent) null)
+				.append("\n§3§nRegion Settings:")
+				.append("\n\n* §5Enabled: ").append("§e§o" + regionSettings.get(0))
+				.append("\n* §5StopWhenCrouch: ").append("§e§o" + regionSettings.get(3))
+				.append("\n* §5RequirePermission: ").append("§e§o" + regionSettings.get(6))
+				.append("\n* §5BounceForce: ").append("§e§o" + regionSettings.get(1))
+				.append("\n* §5BounceSound: ").append("§e§o" + regionSettings.get(2))
+				.append("\n* §5FallDamage: ").append("§e§o" + regionSettings.get(4))
+				.append("\n* §5DeathMessage: ").append("§e§o" + regionSettings.get(5))
+				.append("\n* §5BounceBlocks: ").append("§e§o" + regionSettings.get(8))
+				.append("\n* §5IsBlockBlacklist: ").append("§e§o" + regionSettings.get(7))
+				.append("\n§6------------------------------------------------")
 				.create());
 	}
 	
@@ -82,31 +82,27 @@ public class Messages implements Listener {
 			//PLAYER MSG
 			send(sender, "&c-------------- &4CASIEBOUNCE CONFIG ERRORS &c--------------");
 			for(int i = 0; i < errors.size(); i += 2) {
-				if(errors.get(i).toString().equals("BounceBlocks_")) {
-					send(sender, "&c- The block '" + errors.get(i + 1) + "' is not recognized!");
+				if(errors.get(i).toString().equals("BounceBlocks_")) {send(sender, "&c- The block '" + errors.get(i + 1) + "' is not recognized!");
 				} else {send(sender, "&c- The config section '" + errors.get(i) + "' with the value '" + errors.get(i + 1) + "' is not recognized!");}
-			}
-			send(sender, "&c-----------------------------------------------------&r");
+			} send(sender, "&c-----------------------------------------------------&r");
 		} else {
 			if(sender instanceof Player) {getErrorMSG(sender);}
 			//CONSOLE MSG
 			sender = Bukkit.getConsoleSender();
 			send(sender, "&c-------------------- &4CASIEBOUNCE CONFIG ERRORS &c--------------------");
 			for(int i = 0; i < errors.size(); i += 2) {
-				if(errors.get(i).toString().equals("BounceBlocks_")) {
-					send(sender, "&c- The block '" + errors.get(i + 1) + "' is not recognized!");
+				if(errors.get(i).toString().equals("BounceBlocks_")) {send(sender, "&c- The block '" + errors.get(i + 1) + "' is not recognized!");
 				} else {send(sender, "&c- The config section '" + errors.get(i) + "' with the value '" + errors.get(i + 1) + "' is not recognized!");}
-			}
-			send(sender, "&c-------------------------------------------------------------------");
+			} send(sender, "&c-------------------------------------------------------------------");
 		}
 	}
 
 	@SuppressWarnings("deprecation")
 	public void getErrorMSG(CommandSender sender) {
-		sender.spigot().sendMessage(new ComponentBuilder("[").color(ChatColor.GOLD).append("CasieBounce").color(ChatColor.AQUA).append("] ").color(ChatColor.GOLD)
-				.append("There are errors in the config, check the console or type ").color(ChatColor.RED)
-				.append("/cb GetErrors").color(ChatColor.GRAY).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("/cb GetErrors").color(ChatColor.GREEN).create())).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb GetErrors"))
-				.append(" for more info!").color(ChatColor.RED).event((HoverEvent) null).event((ClickEvent) null)
+		sender.spigot().sendMessage(new ComponentBuilder("§6[§bCasieBounce§6]")
+				.append("§cThere are errors in the config, check the console or type ")
+				.append("§7/cb GetErrors").event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§a/cb GetErrors").create())).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb GetErrors"))
+				.append("§c for more info!").event((HoverEvent) null).event((ClickEvent) null)
 				.create());
 	}
 
@@ -114,8 +110,6 @@ public class Messages implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player player = e.getPlayer();
 		if(!plugin.canBounce && player.hasPermission("CB.admin")) {getErrorMSG(player);}
-		if(plugin.wgError && player.hasPermission("CB.admin")) {
-			send(player, "&6[&bCasieBounce&6] &cDue to a reload the WorldGuard flags are disabled. Please fully restart your server to fix it!");
-		}
+		if(plugin.wgError && player.hasPermission("CB.admin")) {send(player, "&6[&bCasieBounce&6] &cDue to a reload the WorldGuard flags are disabled. Please fully restart your server to fix it!");}
 	}
 }

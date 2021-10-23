@@ -25,20 +25,17 @@ public class ConfigManager {
 
 	// 0 = WorldGuardFlags | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage 
 	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8 = BounceBlocks
-
 	public ArrayList<Object> getConfigSettings() {
 		ArrayList<Object> configSettings = new ArrayList<>();
-		
 		configSettings.add(config.getBoolean(".WorldGuardFlags"));
 		configSettings.add(config.getDouble(".BounceForce"));
 		configSettings.add(config.getString(".BounceSound"));
 		configSettings.add(config.getBoolean(".StopWhenCrouch"));
-		configSettings.add(config.getString(".FallDamage"));
+		configSettings.add(config.getBoolean(".FallDamage"));
 		configSettings.add(config.getString(".DeathMessage"));
 		configSettings.add(config.getBoolean(".RequirePermission"));
 		configSettings.add(config.getBoolean(".IsBlockBlacklist"));
 		configSettings.add(config.getStringList(".BounceBlocks"));
-		
 		return configSettings;
 	}
 
@@ -52,10 +49,8 @@ public class ConfigManager {
 	
 	public void checkConfig(CommandSender sender, Boolean isCommand) {
 		ArrayList<Object> errors = new ArrayList<>();
-
 		if(!(config.get(".WorldGuardFlags") instanceof Boolean)) {errors.add("WorldGuardFlags"); errors.add(config.get(".WorldGuardFlags"));}
 		if(!(config.get(".BounceForce") instanceof Double)) {errors.add("BounceForce"); errors.add(config.get(".BounceForce"));}
-
 		Object bounceSound = config.get(".BounceSound");
 		if(!(bounceSound instanceof String)) {
 			errors.add("BounceSound");
@@ -67,22 +62,10 @@ public class ConfigManager {
 			}
 		}
 		if(!(config.get(".StopWhenCrouch") instanceof Boolean)) {errors.add("StopWhenCrouch"); errors.add(config.get(".StopWhenCrouch"));}
-
-		Object falldamage = config.get(".FallDamage");
-		if(!(falldamage instanceof String)) {
-			errors.add("FallDamage");
-			errors.add(falldamage);
-		} else {
-			if(!falldamage.equals("ENABLED") && !falldamage.equals("DISABLED") && !falldamage.equals("REDUCED")) {
-				errors.add("FallDamage");
-				errors.add(falldamage);
-			}
-		}
-
+		if(!(config.get(".FallDamage") instanceof Boolean)) {errors.add("FallDamage"); errors.add(config.get(".FallDamage"));}
 		if(!(config.get(".DeathMessage") instanceof String)) {errors.add("DeathMessage"); errors.add(config.get(".DeathMessage"));}
 		if(!(config.get(".RequirePermission") instanceof Boolean)) {errors.add("RequirePermission"); errors.add(config.get(".RequirePermission"));}
 		if(!(config.get(".IsBlockBlacklist") instanceof Boolean)) {errors.add("IsBlockBlacklist"); errors.add(config.get(".IsBlockBlacklist"));}
-
 		Object bounceBlocks = config.get(".BounceBlocks");
 		if(!(bounceBlocks instanceof List<?>)) {
 			errors.add("BounceBlocks");
@@ -95,19 +78,20 @@ public class ConfigManager {
 				}
 			}
 		}
-
 		if(!errors.isEmpty()) {
 			plugin.canBounce = false;
 			msg.errorMessage(sender, errors, isCommand);
 		} else {plugin.canBounce = true;}
 	}
 	
-	//Check if Sound and Block are valid
+	//Check if Sound is valid
 	private boolean checkSound(String sound) {
 		try {Sound.valueOf(sound);
 		} catch (IllegalArgumentException e) {return false;}
 		return true;
 	}
+	
+	//Check if Block is valid
 	private boolean checkBlock(String block) {
 		if(block.contains(":")) {
 			String[] blockSplit = block.split(":");

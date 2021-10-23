@@ -19,7 +19,6 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import me.casiebarie.casiebounce.Main;
-import me.casiebarie.casiebounce.managers.flag.ForcedStateFlag.ForcedState;
 
 public class WorldGuardManager {
 	private Main plugin;
@@ -31,21 +30,17 @@ public class WorldGuardManager {
 	
 	public ArrayList<Object> getRegionSettings(Player player) {
 		if (!plugin.wgEnabled) {return null;}
-		
 		org.bukkit.Location location = player.getLocation();
 		Location loc = BukkitAdapter.adapt(location);
 		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 		RegionQuery query = container.createQuery();
 		ApplicableRegionSet set = query.getApplicableRegions(loc);
-		
 		LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-		
 		ArrayList<Object> regionSettings = new ArrayList<>();
-		Boolean enabled = null, stopWhenCrouch = null, requirePermission = null, isBlockBlacklist = null;
+		Boolean enabled = null, stopWhenCrouch = null, requirePermission = null, isBlockBlacklist = null, fallDamage = null;
 		Double bounceForce = null;
 		Set<Sound> bounceSound = null;
 		String deathMessage = null;
-		ForcedState fallDamage = null;
 		Collection<Set<Material>> wgBounceBlocks = null;
 		try {
 			enabled = set.queryValue(localPlayer, Main.CB_ENABLED);
@@ -58,12 +53,11 @@ public class WorldGuardManager {
 			deathMessage = set.queryValue(localPlayer, Main.CB_DEATHMESSAGE);
 			wgBounceBlocks = set.queryAllValues(localPlayer, Main.CB_BOUNCEBLOCKS);
 		} catch (NullPointerException e) {}
-
 		regionSettings.add((enabled != null) ? enabled : false);
 		regionSettings.add((bounceForce != null) ? bounceForce : d);
-		regionSettings.add((bounceSound.toString() != null) ? bounceSound : d);
+		regionSettings.add((bounceSound != null) ? bounceSound.toString().replaceAll("[\\[\\]]", "") : d);
 		regionSettings.add((stopWhenCrouch != null) ? stopWhenCrouch : d);
-		regionSettings.add((fallDamage.name() != null) ? fallDamage : d);
+		regionSettings.add((fallDamage != null) ? fallDamage : d);
 		regionSettings.add((deathMessage != null) ? deathMessage : d);
 		regionSettings.add((requirePermission != null) ? requirePermission : d);
 		regionSettings.add((isBlockBlacklist != null) ? isBlockBlacklist : d);

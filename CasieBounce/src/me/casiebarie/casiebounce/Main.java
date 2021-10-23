@@ -27,7 +27,6 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import me.casiebarie.casiebounce.managers.ConfigManager;
 import me.casiebarie.casiebounce.managers.WorldGuardManager;
 import me.casiebarie.casiebounce.managers.flag.BlockFlag;
-import me.casiebarie.casiebounce.managers.flag.ForcedStateFlag;
 import me.casiebarie.casiebounce.managers.flag.SoundFlag;
 import me.casiebarie.casiebounce.other.Commands;
 import me.casiebarie.casiebounce.other.Messages;
@@ -45,10 +44,9 @@ public class Main extends JavaPlugin {
 	//WorldGuard Flags
 	public static DoubleFlag CB_BOUNCEFORCE;
 	public static StringFlag CB_DEATHMESSAGE;
-	public static ForcedStateFlag CB_FALLDAMAGE;
 	public static SetFlag<Sound> CB_BOUNCESOUND;
 	public static SetFlag<Material> CB_BOUNCEBLOCKS;
-	public static BooleanFlag CB_ENABLED, CB_STOPWHENCROUCH, CB_REQUIREPERMISSION, CB_ISBLOCKBLACKLIST;
+	public static BooleanFlag CB_ENABLED, CB_STOPWHENCROUCH, CB_REQUIREPERMISSION, CB_ISBLOCKBLACKLIST, CB_FALLDAMAGE;
 
 	@Override
 	public void onEnable() {
@@ -73,7 +71,6 @@ public class Main extends JavaPlugin {
 		config = YamlConfiguration.loadConfiguration(cFile);
 		wgEnabled = false;
 		wgError = false;
-		
 		//WorldGuard Check
 		if(worldGuardPlugin == null) {getLogger().warning("WorldGuard not found, flags disabled!"); return;}
 		getLogger().info("WorldGuard found!");
@@ -114,12 +111,12 @@ public class Main extends JavaPlugin {
 				}
 				//FallDamage
 				try {
-					ForcedStateFlag flag = new ForcedStateFlag("cb-falldamage");
+					BooleanFlag flag = new BooleanFlag("cb-falldamage");
 					registry.register(flag);
 					CB_FALLDAMAGE = flag;
 				} catch (FlagConflictException e) {
 					Flag<?> existing = registry.get("cb-falldamage");
-					if(existing instanceof ForcedStateFlag) {CB_FALLDAMAGE = (ForcedStateFlag) existing;}
+					if(existing instanceof BooleanFlag) {CB_FALLDAMAGE = (BooleanFlag) existing;}
 				}
 				//DeathMessage
 				try {

@@ -28,7 +28,7 @@ public class UpdateChecker implements Listener {
 	private String permission;
 	JSONParser parser = new JSONParser();
 	private static Boolean isNewVersion = false;
-	private static String newVersion;
+	private static String spigotVersion;
 	private static String currVersion;
 	private void send(String msg) {Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', msg));}
 	public UpdateChecker(Main plugin, Integer recourceID, String permission) {
@@ -41,16 +41,27 @@ public class UpdateChecker implements Listener {
 	public void checkForUpdate() {
 		currVersion = plugin.getDescription().getVersion();
 		Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-			getLatestVersion(version -> {newVersion = version;});
-			if(newVersion == null) {return;}
-			if(currVersion == newVersion) {plugin.getLogger().info(String.format("You are using the most recent version. (v%s)", currVersion)); return;}
-			isNewVersion = true;
+			getLatestVersion(version -> {spigotVersion = version;});
+			if(spigotVersion == null) {return;}
+			int spigotVersionINT = Integer.parseInt(spigotVersion.replaceAll("\\.", ""));
+			int currVersionINT = Integer.parseInt(currVersion.replaceAll("\\.", ""));
+			if(currVersionINT == spigotVersionINT) {plugin.getLogger().info(String.format("You are using the most recent version. (v%s)", currVersion)); return;}
 			List<String> lines = new ArrayList<>();
-			lines.add(String.format("There is a new version of &b%s &eavailable!", plugin.getName()));
-			lines.add(" ");
-			lines.add(String.format("Current version: &cv%s", currVersion));
-			lines.add(String.format("    New version: &av%s", newVersion));
-			lines.add(" ");
+			if(currVersionINT > spigotVersionINT) {
+				lines.add(String.format("You are using the beta version of &b%s&e!", plugin.getName()));
+				lines.add(" ");
+				lines.add(String.format("Current version: &6v%s", currVersion));
+				lines.add(String.format(" Public version: &av%s", spigotVersion));
+				lines.add(" ");
+				lines.add("Please note that this version is not officially released!");
+			} else {
+				isNewVersion = true;
+				lines.add(String.format("There is a new version of &b%s &eavailable!", plugin.getName()));
+				lines.add(" ");
+				lines.add(String.format("Current version: &cv%s", currVersion));
+				lines.add(String.format("    New version: &av%s", spigotVersion));
+				lines.add(" ");
+			}
 			lines.add(String.format("Download: %shttps://www.spigotmc.org/resources/%s", ChatColor.GOLD, recourceID));
 			printToConsole(lines);
 		}, 20l);
@@ -85,7 +96,7 @@ public class UpdateChecker implements Listener {
 				if(isNewVersion && player.hasPermission(permission)) {
 					player.spigot().sendMessage(new ComponentBuilder("[").color(ChatColor.GOLD).append(plugin.getName()).color(ChatColor.AQUA).append("] ").color(ChatColor.GOLD)
 						.append("There is a new update available. (").color(ChatColor.GRAY)
-						.append("v" + newVersion).color(ChatColor.GREEN)
+						.append("v" + spigotVersion).color(ChatColor.GREEN)
 						.append(") Download the new version on the ").color(ChatColor.GRAY)
 						.append("Spigot").color(ChatColor.YELLOW).underlined(true)
 						.event(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("https://www.spigotmc.org/resources/" + recourceID).color(ChatColor.GRAY).create()))

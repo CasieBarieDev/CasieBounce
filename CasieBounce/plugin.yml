@@ -1,7 +1,7 @@
 name: CasieBounce
 author: CasieBarie
 website: https://www.casiebariedev.ga/
-version: 5.0
+version: 5.2
 description: Bounce!
 api-version: 1.13
 main: me.casiebarie.casiebounce.Main
