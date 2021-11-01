@@ -62,6 +62,7 @@ public class Bounce implements Listener {
 		if(finalSettings == null) {return;}
 		player.setVelocity(new Vector(0, (double) finalSettings.get(1), 0));
 		player.setFallDistance(0);
+		plugin.bounces += 1;
 		try {player.playSound(player.getLocation(), Sound.valueOf((String) finalSettings.get(2)), 1f, 1f);
 		} catch (Exception e) {e.printStackTrace();}
 		isBouncing.add(player.getUniqueId());

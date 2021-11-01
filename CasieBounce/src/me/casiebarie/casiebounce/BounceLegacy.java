@@ -63,6 +63,7 @@ public class BounceLegacy implements Listener {
 		isBouncing.remove(player.getUniqueId());
 		player.setVelocity(new Vector(0, (double) configSettings.get(1), 0));
 		player.setFallDistance(0);
+		plugin.bounces += 1;
 		try {player.playSound(player.getLocation(), Sound.valueOf((String) configSettings.get(2)), 1f, 1f);
 		} catch (Exception e) {}
 		isBouncing.add(player.getUniqueId());

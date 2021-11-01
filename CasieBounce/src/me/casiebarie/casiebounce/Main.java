@@ -3,6 +3,7 @@ package me.casiebarie.casiebounce;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -30,6 +31,7 @@ import me.casiebarie.casiebounce.managers.flag.BlockFlag;
 import me.casiebarie.casiebounce.managers.flag.SoundFlag;
 import me.casiebarie.casiebounce.other.Commands;
 import me.casiebarie.casiebounce.other.Messages;
+import me.casiebarie.casiebounce.other.Metrics;
 import me.casiebarie.casiebounce.other.TabComplete;
 import me.casiebarie.casiebounce.other.UpdateChecker;
 import net.md_5.bungee.api.ChatColor;
@@ -40,6 +42,7 @@ public class Main extends JavaPlugin {
 	public boolean isLegacy;
 	public boolean wgEnabled;
 	public boolean wgError;
+	public int bounces;
 	private FileConfiguration config;
 	//WorldGuard Flags
 	public static DoubleFlag CB_BOUNCEFORCE;
@@ -51,7 +54,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
-		//Call Constructors
+		//CALL CONSTRUCTORS
 		WorldGuardManager wgM = new WorldGuardManager(this);
 		Messages msg = new Messages(this, wgM);
 		ConfigManager configManager = new ConfigManager(this, msg);
@@ -60,6 +63,19 @@ public class Main extends JavaPlugin {
 		if(isLegacy) {new BounceLegacy(this, configManager);
 		} else if(!isLegacy) {new Bounce(this, wgM, configManager);}
 		new UpdateChecker(this, 90967, "CB.admin").checkForUpdate();
+
+		//METRICS
+		Metrics metrics = new Metrics(this, 13216);
+		//Pie - Using WorldGuard
+		metrics.addCustomChart(new Metrics.SimplePie("using_worldguard", () -> {
+			if(configManager.getConfigSettings().get(0).equals(true) && wgEnabled) {return "True";}
+			else {return "False";}
+		}));
+		//Line - Bounces
+		metrics.addCustomChart(new Metrics.SingleLineChart("bounces", new Callable<Integer>() {
+			@Override
+			public Integer call() throws Exception {return bounces;}
+		}));
 	}
 	
 	@SuppressWarnings("unchecked")
