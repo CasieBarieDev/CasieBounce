@@ -7,18 +7,15 @@ import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import me.casiebarie.casiebounce.Main;
 
 public class TabComplete implements TabCompleter {
-	private Main plugin;
 	private enum complete {ReloadConfig, Info, GetErrors, GetRegionSettings}
-	private String wGF = "WorldGuardFlags";
-	public TabComplete(Main plugin) {
-		this.plugin = plugin;
-		plugin.getCommand("CB").setTabCompleter(this);
-	}
-
+	private Main plugin;
+	private String wGF = "WorldGuard";
+	public TabComplete(Main plugin) {this.plugin = plugin; plugin.getCommand("CB").setTabCompleter(this);}
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		List<String> completions = new ArrayList<>();
@@ -37,7 +34,8 @@ public class TabComplete implements TabCompleter {
 				}
 			}
 		}
-		if(!plugin.wgEnabled) {completions.remove("GetRegionSettings");}
+		if(!plugin.wgEnabled || !(sender instanceof Player)) {completions.remove("GetRegionSettings");}
+		if(!(sender instanceof Player)) {completions.remove("Info"); completions.remove("WorldGuard");}
 		if(plugin.canBounce) {completions.remove("GetErrors");}
 		Collections.sort(completions);
 		return completions;

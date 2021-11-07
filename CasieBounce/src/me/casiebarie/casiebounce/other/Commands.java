@@ -19,7 +19,6 @@ public class Commands implements CommandExecutor, Listener {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		plugin.getCommand("CB").setExecutor(this);
 	}
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("CB")) {
@@ -28,11 +27,12 @@ public class Commands implements CommandExecutor, Listener {
 					if(args[0].toUpperCase().equals("RELOADCONFIG")) {
 						configManager.reloadConfig(sender);
 					} else if(args[0].toUpperCase().equals("GETREGIONSETTINGS")) {
-						if(sender instanceof Player) {msg.regionInfo(sender);}
+						if(sender instanceof Player) {msg.regionInfo(sender);
+						} else {msg.send(sender, "&cThis command can only be executed by a player!");}
 					} else if(args[0].toUpperCase().equals("INFO")) {
 						if(sender instanceof Player) {
 							if(args.length == 2) {
-								if(args[1].toUpperCase().equals("WORLDGUARDFLAGS")) {msg.WorldGuardInfo(sender);
+								if(args[1].toUpperCase().equals("WORLDGUARD")) {msg.WorldGuardInfo(sender);
 								} else {msg.info(sender);}
 							} else {msg.info(sender);}
 						} else {msg.send(sender, "&cThis command can only be executed by a player!");}

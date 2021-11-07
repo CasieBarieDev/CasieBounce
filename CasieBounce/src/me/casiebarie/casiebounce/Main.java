@@ -1,20 +1,26 @@
 package me.casiebarie.casiebounce;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.BooleanFlag;
@@ -24,6 +30,9 @@ import com.sk89q.worldguard.protection.flags.SetFlag;
 import com.sk89q.worldguard.protection.flags.StringFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
 
 import me.casiebarie.casiebounce.managers.ConfigManager;
 import me.casiebarie.casiebounce.managers.WorldGuardManager;
@@ -37,19 +46,17 @@ import me.casiebarie.casiebounce.other.UpdateChecker;
 import net.md_5.bungee.api.ChatColor;
 
 public class Main extends JavaPlugin {
-	public WorldGuardPlugin worldGuardPlugin;
-	public boolean canBounce;
-	public boolean isLegacy;
-	public boolean wgEnabled;
-	public boolean wgError;
-	public int bounces;
-	private FileConfiguration config;
+	public static WorldGuardPlugin worldGuardPlugin;
+	public static ConfigManager configManager;
 	//WorldGuard Flags
 	public static DoubleFlag CB_BOUNCEFORCE;
 	public static StringFlag CB_DEATHMESSAGE;
 	public static SetFlag<Sound> CB_BOUNCESOUND;
 	public static SetFlag<Material> CB_BOUNCEBLOCKS;
 	public static BooleanFlag CB_ENABLED, CB_STOPWHENCROUCH, CB_REQUIREPERMISSION, CB_ISBLOCKBLACKLIST, CB_FALLDAMAGE;
+	public boolean canBounce, isLegacy, wgEnabled, wgError;
+	public int bounces;
+	private FileConfiguration config;
 
 	@Override
 	public void onEnable() {
@@ -57,7 +64,7 @@ public class Main extends JavaPlugin {
 		//CALL CONSTRUCTORS
 		WorldGuardManager wgM = new WorldGuardManager(this);
 		Messages msg = new Messages(this, wgM);
-		ConfigManager configManager = new ConfigManager(this, msg);
+		configManager = new ConfigManager(this, msg);
 		new Commands(this, configManager, msg);
 		new TabComplete(this);
 		if(isLegacy) {new BounceLegacy(this, configManager);
@@ -74,10 +81,26 @@ public class Main extends JavaPlugin {
 		//Line - Bounces
 		metrics.addCustomChart(new Metrics.SingleLineChart("bounces", new Callable<Integer>() {
 			@Override
-			public Integer call() throws Exception {return bounces;}
+			public Integer call() throws Exception {Integer rBounce = bounces; bounces = 0; return rBounce;}
+		}));
+		//Pie - Region Count
+		metrics.addCustomChart(new Metrics.SimplePie("amount_of_regions", () -> {
+			if(configManager.getConfigSettings().get(0).equals(true) && wgEnabled) {return getRegionAmount();
+			} else {return "No WorldGuard";}
+		}));
+		//*Pie - BounceBlocks
+		metrics.addCustomChart(new Metrics.AdvancedPie("bounce_blocks", new
+				Callable<Map<String,Integer>>() {
+			@Override public Map<String, Integer> call() throws Exception {
+				Map<String,Integer> valueMap = new HashMap<>();
+				ArrayList<String> bounceBlocks = new ArrayList<>();
+				bounceBlocks = getAllBounceBlocks();
+				for(String bounceBlock : bounceBlocks) {valueMap.put(bounceBlock, 1);}
+				return valueMap;
+			}
 		}));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onLoad() {
@@ -143,17 +166,17 @@ public class Main extends JavaPlugin {
 					Flag<?> existing = registry.get("cb-deathmessage");
 					if(existing instanceof StringFlag) {CB_DEATHMESSAGE = (StringFlag) existing;}
 				}
-				
+
 				//BounceBlocks
 				try {
-					SetFlag<Material> flag = new SetFlag<Material>("cb-bounceblocks", new BlockFlag(null));
+					SetFlag<Material> flag = new SetFlag<>("cb-bounceblocks", new BlockFlag(null));
 					registry.register(flag);
 					CB_BOUNCEBLOCKS = flag;
 				} catch (FlagConflictException e) {
 					Flag<?> existing = registry.get("cb-bounceblocks");
 					if(existing instanceof SetFlag<?>) {CB_BOUNCEBLOCKS = (SetFlag<Material>) existing;}
 				}
-				
+
 				//StopWhenCrouch
 				try {
 					BooleanFlag flag = new BooleanFlag("cb-stopwhencrouch");
@@ -195,6 +218,44 @@ public class Main extends JavaPlugin {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	private ArrayList<String> getAllBounceBlocks() {
+		ArrayList<String> bounceBlocks = new ArrayList<>();
+		if(configManager.getConfigSettings().get(0).equals(true) && wgEnabled) {
+			RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+			for(World world : getServer().getWorlds()) {
+				RegionManager regions = container.get(BukkitAdapter.adapt(world));
+				Map<String, ProtectedRegion> regionMap = regions.getRegions();
+				for(Entry<String, ProtectedRegion> regionEntry : regionMap.entrySet()) {
+					for(Material block : regionEntry.getValue().getFlag(CB_BOUNCEBLOCKS)) {
+						if(!bounceBlocks.contains(block.name().toUpperCase())) {bounceBlocks.add(block.name().toUpperCase());}
+					}
+				}
+			}
+		}
+		List<String> configBounceBlocks = (List<String>) configManager.getConfigSettings().get(8);
+		for(String blockName : configBounceBlocks) {if(!bounceBlocks.contains(blockName.toUpperCase())) {bounceBlocks.add(blockName.toUpperCase());}}
+		return bounceBlocks;
+	}
+
+	private String getRegionAmount() {
+		int regionAmount = 0;
+		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		for(World world : getServer().getWorlds()) {
+			RegionManager regions = container.get(BukkitAdapter.adapt(world));
+			Map<String, ProtectedRegion> regionMap = regions.getRegions();
+			for(Entry<String, ProtectedRegion> regionEntry : regionMap.entrySet()) {
+				if(regionEntry.getValue().getFlag(CB_ENABLED).booleanValue()) {regionAmount += 1;}
+			}
+		} return "" + regionAmount;
+	}
+
+	public WorldGuardPlugin getWorldGuard() {
+		Plugin plugin = this.getServer().getPluginManager().getPlugin("WorldGuard");
+		if(plugin == null || !(plugin instanceof WorldGuardPlugin)) {return null;}
+		return (WorldGuardPlugin) plugin;
+	}
+
 	public void legacyCheck() {
 		final String BukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
 		final List<String> LegacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
@@ -206,11 +267,5 @@ public class Main extends JavaPlugin {
 			getLogger().severe("Incompatible version. Disabling plugin");
 			getServer().getPluginManager().disablePlugin(this);
 		}
-	}
-	
-	public WorldGuardPlugin getWorldGuard() {
-		Plugin plugin = this.getServer().getPluginManager().getPlugin("WorldGuard");
-		if(plugin == null || !(plugin instanceof WorldGuardPlugin)) {return null;}
-		return (WorldGuardPlugin) plugin;
 	}
 }

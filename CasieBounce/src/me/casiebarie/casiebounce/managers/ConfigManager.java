@@ -14,39 +14,22 @@ import me.casiebarie.casiebounce.Main;
 import me.casiebarie.casiebounce.other.Messages;
 
 public class ConfigManager {
+	private static FileConfiguration config;
 	private Main plugin;
 	private Messages msg;
-	private static FileConfiguration config;
-	public ConfigManager(Main plugin, Messages msg) {
-		this.plugin = plugin;
-		this.msg = msg;
-		reloadConfig(null);
+	public ConfigManager(Main plugin, Messages msg) {this.plugin = plugin; this.msg = msg; reloadConfig(null);}
+	//Check if Block is valid
+	private boolean checkBlock(String block) {
+		if(block.contains(":")) {
+			String[] blockSplit = block.split(":");
+			if(blockSplit.length > 2) {return false;}
+			try {Byte.parseByte(blockSplit[1]);
+			} catch (NumberFormatException e) {return false;}
+			if(Material.getMaterial(blockSplit[0]) != null) {return true;}
+		} else if(Material.getMaterial(block) != null) {return true;}
+		return false;
 	}
 
-	// 0 = WorldGuardFlags | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage 
-	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8 = BounceBlocks
-	public ArrayList<Object> getConfigSettings() {
-		ArrayList<Object> configSettings = new ArrayList<>();
-		configSettings.add(config.getBoolean(".WorldGuardFlags"));
-		configSettings.add(config.getDouble(".BounceForce"));
-		configSettings.add(config.getString(".BounceSound"));
-		configSettings.add(config.getBoolean(".StopWhenCrouch"));
-		configSettings.add(config.getBoolean(".FallDamage"));
-		configSettings.add(config.getString(".DeathMessage"));
-		configSettings.add(config.getBoolean(".RequirePermission"));
-		configSettings.add(config.getBoolean(".IsBlockBlacklist"));
-		configSettings.add(config.getStringList(".BounceBlocks"));
-		return configSettings;
-	}
-
-	public void reloadConfig(CommandSender sender) {
-		File cFile = new File(plugin.getDataFolder() + File.separator + "config.yml");
-		config = YamlConfiguration.loadConfiguration(cFile);
-		plugin.saveDefaultConfig();
-		checkConfig(sender, false);
-		msg.send(sender, "&6[&bCasieBounce&6] &aReloaded config.");
-	}
-	
 	public void checkConfig(CommandSender sender, Boolean isCommand) {
 		ArrayList<Object> errors = new ArrayList<>();
 		if(!(config.get(".WorldGuardFlags") instanceof Boolean)) {errors.add("WorldGuardFlags"); errors.add(config.get(".WorldGuardFlags"));}
@@ -83,23 +66,35 @@ public class ConfigManager {
 			msg.errorMessage(sender, errors, isCommand);
 		} else {plugin.canBounce = true;}
 	}
-	
+
 	//Check if Sound is valid
 	private boolean checkSound(String sound) {
 		try {Sound.valueOf(sound);
 		} catch (IllegalArgumentException e) {return false;}
 		return true;
 	}
-	
-	//Check if Block is valid
-	private boolean checkBlock(String block) {
-		if(block.contains(":")) {
-			String[] blockSplit = block.split(":");
-			if(blockSplit.length > 2) {return false;}
-			try {Byte.parseByte(blockSplit[1]);
-			} catch (NumberFormatException e) {return false;}
-			if(Material.getMaterial(blockSplit[0]) != null) {return true;}
-		} else if(Material.getMaterial(block) != null) {return true;}
-		return false;
+
+	// 0 = WorldGuardFlags | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage
+	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8 = BounceBlocks
+	public ArrayList<Object> getConfigSettings() {
+		ArrayList<Object> configSettings = new ArrayList<>();
+		configSettings.add(config.getBoolean(".WorldGuardFlags"));
+		configSettings.add(config.getDouble(".BounceForce"));
+		configSettings.add(config.getString(".BounceSound"));
+		configSettings.add(config.getBoolean(".StopWhenCrouch"));
+		configSettings.add(config.getBoolean(".FallDamage"));
+		configSettings.add(config.getString(".DeathMessage"));
+		configSettings.add(config.getBoolean(".RequirePermission"));
+		configSettings.add(config.getBoolean(".IsBlockBlacklist"));
+		configSettings.add(config.getStringList(".BounceBlocks"));
+		return configSettings;
+	}
+
+	public void reloadConfig(CommandSender sender) {
+		File cFile = new File(plugin.getDataFolder() + File.separator + "config.yml");
+		config = YamlConfiguration.loadConfiguration(cFile);
+		plugin.saveDefaultConfig();
+		checkConfig(sender, false);
+		msg.send(sender, "&6[&bCasieBounce&6] &aReloaded config.");
 	}
 }

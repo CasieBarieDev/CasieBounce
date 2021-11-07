@@ -9,8 +9,7 @@
 # 
 # --------------------------------------------------------------------------------------------------------
 # If the WorldGuard Flags are enabled or not. Once enabled you have to fully restart your server so the flags
-# can be registered in WorldGuard. NOTE: the flag registration can not be undone! You will always see the flags
-# in the flag list, even when CasieBounce is not enabled. (1.13+ Only)
+# can be registered in WorldGuard. (1.13+ Only)
 WorldGuardFlags: false
 # --------------------------------------------------------------------------------------------------------
 

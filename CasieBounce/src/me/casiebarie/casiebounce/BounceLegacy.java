@@ -12,9 +12,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -36,10 +36,9 @@ public class BounceLegacy implements Listener {
 	@SuppressWarnings({"deprecation", "unchecked"})
 	private boolean canBounce(Player player) {
 		Block block = player.getLocation().getBlock().getRelative(BlockFace.DOWN);
-		List<Boolean> blockValid = new ArrayList<Boolean>();
+		List<Boolean> blockValid = new ArrayList<>();
 		configSettings = configManager.getConfigSettings();
-		if(!plugin.canBounce) {return false;}
-		if(configSettings.get(6).equals(true) && player.hasPermission("CB.bounce")) {return false;}
+		if(!plugin.canBounce || (configSettings.get(6).equals(true) && player.hasPermission("CB.bounce"))) {return false;}
 		if(player.isSneaking() && configSettings.get(3).equals(true)) {return false;}
 		List<String> bounceBlocks = (List<String>) configSettings.get(8);
 		for(String blockName : bounceBlocks) {
@@ -58,7 +57,7 @@ public class BounceLegacy implements Listener {
 			} else {return false;}
 		}
 	}
-	
+
 	private void goBounce(Player player) {
 		isBouncing.remove(player.getUniqueId());
 		player.setVelocity(new Vector(0, (double) configSettings.get(1), 0));
@@ -68,38 +67,17 @@ public class BounceLegacy implements Listener {
 		} catch (Exception e) {}
 		isBouncing.add(player.getUniqueId());
 	}
-	
-	@EventHandler
-	public void onPlayerMove(PlayerMoveEvent e) {
-		Player player = e.getPlayer();
-		if(isBouncing.contains(player.getUniqueId())) {return;}
-		if(canBounce(player)) {goBounce(player);}
-	}
 
 	@EventHandler
-	public void onPlayerLand(PlayerMoveEvent e) {
-		Player player = e.getPlayer();
-		Entity entity = player;
-		if(!isBouncing.contains(player.getUniqueId())) {return;}
-		if(!entity.isOnGround()) {return;}
-		if(player.getFallDistance() < 0) {return;}
-		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {public void run() {
-			if(canBounce(player)) {goBounce(player);
-			} else {isBouncing.remove(player.getUniqueId());}
-		}}, 1l);
-	}
-	
-	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent e) {
-		if(!(e.getEntity() instanceof Player)) {return;}
-		if(e.getCause() != DamageCause.FALL) {return;}
+		if(!(e.getEntity() instanceof Player) || (e.getCause() != DamageCause.FALL)) {return;}
 		Player player = (Player) e.getEntity();
 		canDie.remove(player.getUniqueId());
 		if(!isBouncing.contains(player.getUniqueId())) {return;}
 		if(configSettings.get(4).equals(false)) {e.setCancelled(true);}
 		else {canDie.add(player.getUniqueId());}
 	}
-	
+
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		Player player = e.getEntity();
@@ -107,5 +85,24 @@ public class BounceLegacy implements Listener {
 			String deathMessage = configSettings.get(5).toString().replaceAll("%player%", player.getDisplayName());
 			e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', deathMessage));
 		} canDie.remove(player.getUniqueId());
+	}
+
+	@EventHandler
+	public void onPlayerLand(PlayerMoveEvent e) {
+		Player player = e.getPlayer();
+		Entity entity = player;
+		if(!isBouncing.contains(player.getUniqueId()) || !entity.isOnGround() || (player.getFallDistance() < 0)) {return;}
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {@Override
+		public void run() {
+			if(canBounce(player)) {goBounce(player);
+			} else {isBouncing.remove(player.getUniqueId());}
+		}}, 1l);
+	}
+
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent e) {
+		Player player = e.getPlayer();
+		if(isBouncing.contains(player.getUniqueId())) {return;}
+		if(canBounce(player)) {goBounce(player);}
 	}
 }

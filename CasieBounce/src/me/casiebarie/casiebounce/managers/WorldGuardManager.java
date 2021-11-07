@@ -24,10 +24,8 @@ public class WorldGuardManager {
 	private Main plugin;
 	private String d = "DEFAULT";
 	public WorldGuardManager(Main plugin) {this.plugin = plugin;}
-	
-	// 0 = Enabled | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage 
-	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8+ = BounceBlocks
-	
+	// 0 = Enabled | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage
+	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8 = BounceBlocks
 	public ArrayList<Object> getRegionSettings(Player player) {
 		if (!plugin.wgEnabled) {return null;}
 		org.bukkit.Location location = player.getLocation();

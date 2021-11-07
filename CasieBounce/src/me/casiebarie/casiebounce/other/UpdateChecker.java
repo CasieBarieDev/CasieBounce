@@ -23,21 +23,19 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 
 public class UpdateChecker implements Listener {
+	private static Boolean isNewVersion = false;
+	private static String spigotVersion;
+	private static String currVersion;
 	private Main plugin;
 	private Integer recourceID;
 	private String permission;
 	JSONParser parser = new JSONParser();
-	private static Boolean isNewVersion = false;
-	private static String spigotVersion;
-	private static String currVersion;
-	private void send(String msg) {Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', msg));}
 	public UpdateChecker(Main plugin, Integer recourceID, String permission) {
 		this.plugin = plugin;
 		this.recourceID = recourceID;
 		this.permission = permission;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
-	
 	public void checkForUpdate() {
 		currVersion = plugin.getDescription().getVersion();
 		Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
@@ -67,24 +65,12 @@ public class UpdateChecker implements Listener {
 		}, 20l);
 	}
 
-	private void printToConsole(List<String> lines) {
-		int longestLine = 0;
-		for(String line : lines) {longestLine = Math.max(line.length(), longestLine);}
-		longestLine += 4;
-		if(longestLine > 120) {longestLine = 122;}
-		StringBuilder stringBuilder = new StringBuilder(longestLine);
-		Stream.generate(() -> "#").limit(longestLine).forEach(stringBuilder::append);
-		send("&e" + stringBuilder.toString());
-		for(String line : lines) {send("&e# " + line);}
-		send("&e" + stringBuilder.toString());
-	}
-
 	private void getLatestVersion(final Consumer<String> consumer) {
 		try(InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + recourceID).openStream(); Scanner scanner = new Scanner(inputStream)) {
 			if(scanner.hasNext()) {consumer.accept(scanner.next());}
 		} catch (Exception e) {plugin.getLogger().info("Failed to check for updates: " + e.getMessage());}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
@@ -106,4 +92,18 @@ public class UpdateChecker implements Listener {
 			}
 		}, 40l);
 	}
+
+	private void printToConsole(List<String> lines) {
+		int longestLine = 0;
+		for(String line : lines) {longestLine = Math.max(line.length(), longestLine);}
+		longestLine += 4;
+		if(longestLine > 120) {longestLine = 122;}
+		StringBuilder stringBuilder = new StringBuilder(longestLine);
+		Stream.generate(() -> "#").limit(longestLine).forEach(stringBuilder::append);
+		send("&e" + stringBuilder.toString());
+		for(String line : lines) {send("&e# " + line);}
+		send("&e" + stringBuilder.toString());
+	}
+
+	private void send(String msg) {Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', msg));}
 }
