@@ -69,6 +69,7 @@ public class ConfigManager {
 
 	//Check if Sound is valid
 	private boolean checkSound(String sound) {
+		if(sound.equalsIgnoreCase("NONE")) {return true;}
 		try {Sound.valueOf(sound);
 		} catch (IllegalArgumentException e) {return false;}
 		return true;

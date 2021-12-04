@@ -94,9 +94,12 @@ public class Messages implements Listener {
 	public void regionInfo(CommandSender sender) {
 		if(!plugin.wgEnabled) {send(sender, "&6[&bCasieBounce&6] &cWorldGuard is not enabled!"); return;}
 		ArrayList<Object> regionSettings = regionManager.getRegionSettings((Player) sender);
+		String regionName = regionManager.getRegionName((Player) sender);
+		regionName = (regionName != null) ? regionName : "GLOBAL";
 		sender.spigot().sendMessage(new ComponentBuilder("§9<§6-§9<§6-------------- ").append("§b§lCasieBounce §3§lv" + plugin.getDescription().getVersion()).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§9By: §eCasieBarie").create())).append("§6 --------------§9>§6-§9>").event((HoverEvent) null)
 				.append("\n§3§lREGION SETTINGS:\n")
-				.append("\n§7Enabled | " + colorSetting(regionSettings.get(0), "BOOLEAN"))
+				.append("§7Region | §f" + regionName)
+				.append("\n\n§7Enabled | " + colorSetting(regionSettings.get(0), "BOOLEAN"))
 				.append("\n§7BounceForce | " + colorSetting(regionSettings.get(1), "INT"))
 				.append("\n§7BounceSound | " + colorSetting(regionSettings.get(2), "OBJECT"))
 				.append("\n§7StopWhenCrouch | " + colorSetting(regionSettings.get(3), "BOOLEAN"))

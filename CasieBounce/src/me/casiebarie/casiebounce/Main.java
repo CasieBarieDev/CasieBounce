@@ -217,7 +217,7 @@ public class Main extends JavaPlugin {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private ArrayList<String> getAllBounceBlocks() {
 		ArrayList<String> bounceBlocks = new ArrayList<>();
@@ -259,7 +259,7 @@ public class Main extends JavaPlugin {
 	public void legacyCheck() {
 		final String BukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
 		final List<String> LegacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
-		final List<String> Versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3", "1_17_R1", "1_17_R2");
+		final List<String> Versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3", "1_17_R1", "1_17_R2", "1_18_R1", "");
 		if(LegacyVersions.contains(BukkitVersion)) {isLegacy = true;
 		} else if(Versions.contains(BukkitVersion)) {isLegacy = false;
 		} else {

@@ -15,6 +15,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
@@ -28,11 +29,7 @@ public class WorldGuardManager {
 	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8 = BounceBlocks
 	public ArrayList<Object> getRegionSettings(Player player) {
 		if (!plugin.wgEnabled) {return null;}
-		org.bukkit.Location location = player.getLocation();
-		Location loc = BukkitAdapter.adapt(location);
-		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		RegionQuery query = container.createQuery();
-		ApplicableRegionSet set = query.getApplicableRegions(loc);
+		ApplicableRegionSet set = getRegionSet(player);
 		LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 		ArrayList<Object> regionSettings = new ArrayList<>();
 		Boolean enabled = null, stopWhenCrouch = null, requirePermission = null, isBlockBlacklist = null, fallDamage = null;
@@ -65,5 +62,20 @@ public class WorldGuardManager {
 			regionSettings.add(Arrays.asList(bounceBlocksSplit));
 		} else {regionSettings.add(d);}
 		return regionSettings;
+	}
+
+	private ApplicableRegionSet getRegionSet(Player player) {
+		org.bukkit.Location location = player.getLocation();
+		Location loc = BukkitAdapter.adapt(location);
+		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		RegionQuery query = container.createQuery();
+		return query.getApplicableRegions(loc);
+	}
+
+	public String getRegionName(Player player) {
+		ApplicableRegionSet set = getRegionSet(player);
+		for(ProtectedRegion region : set.getRegions()) {
+			if(region.getFlag(Main.CB_ENABLED) != null) {return region.getId();}
+		} return null;
 	}
 }

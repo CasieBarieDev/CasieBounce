@@ -41,7 +41,8 @@ public class Bounce implements Listener {
 		List<Boolean> blockValid = new ArrayList<>();
 		ArrayList<Object> finalSettings = new ArrayList<>();
 		finalSettings = getFinalSettings(player, configManager.getConfigSettings());
-		if((finalSettings == null) || (finalSettings.get(5).equals(true) && player.hasPermission("CB.bounce"))) {return false;}
+		if((finalSettings == null)) {return false;}
+		if(finalSettings.get(6).equals(true)) {if(!player.hasPermission("CB.bounce") && !player.hasPermission("CB.bounce." + wgM.getRegionName(player))) {return false;}}
 		if(player.isSneaking() && finalSettings.get(3).equals(true)) {return false;}
 		@SuppressWarnings("unchecked")
 		List<String> bounceBlocks = (List<String>) finalSettings.get(8);
@@ -74,7 +75,7 @@ public class Bounce implements Listener {
 		player.setFallDistance(0);
 		plugin.bounces += 1;
 		try {player.playSound(player.getLocation(), Sound.valueOf((String) finalSettings.get(2)), 1f, 1f);
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {}
 		isBouncing.add(player.getUniqueId());
 	}
 
