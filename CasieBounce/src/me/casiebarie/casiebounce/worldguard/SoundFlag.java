@@ -1,4 +1,4 @@
-package me.casiebarie.casiebounce.managers.flag;
+package me.casiebarie.casiebounce.worldguard;
 
 import org.bukkit.Sound;
 

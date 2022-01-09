@@ -1,14 +1,14 @@
 name: CasieBounce
 author: CasieBarie
 website: https://www.casiebariedev.ga/
-version: 5.5
-description: Bounce!
+version: 6.0
 api-version: 1.13
 main: me.casiebarie.casiebounce.Main
-softdepend: [WorldGuard]
+softdepend: [WorldGuard, PlaceholderAPI]
 commands:
    CB:
       description: Command of CasieBounce.
+      permission: CB.admin
 permissions:
    CB.*:
       description: All permissions.

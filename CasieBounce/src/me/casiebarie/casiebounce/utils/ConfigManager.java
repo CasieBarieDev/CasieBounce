@@ -1,4 +1,4 @@
-package me.casiebarie.casiebounce.managers;
+package me.casiebarie.casiebounce.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,15 +11,32 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.casiebarie.casiebounce.Main;
-import me.casiebarie.casiebounce.other.Messages;
 
 public class ConfigManager {
 	private static FileConfiguration config;
 	private Main plugin;
 	private Messages msg;
 	public ConfigManager(Main plugin, Messages msg) {this.plugin = plugin; this.msg = msg; reloadConfig(null);}
-	//Check if Block is valid
-	private boolean checkBlock(String block) {
+	public void checkConfig(CommandSender sender, Boolean isCommand) {
+		ArrayList<Object> errors = new ArrayList<>();
+		if(!(config.get(".WorldGuardFlags") instanceof Boolean)) {errors.add("WorldGuardFlags"); errors.add(config.get(".WorldGuardFlags"));}
+		if(!(config.get(".BounceForce") instanceof Double)) {errors.add("BounceForce"); errors.add(config.get(".BounceForce"));}
+		Object bounceSound = config.get(".BounceSound");
+		if(!(bounceSound instanceof String)) {errors.add("BounceSound"); errors.add(bounceSound);
+		} else {if(!checkSound(bounceSound.toString())) {errors.add("BounceSound"); errors.add(bounceSound);}}
+		if(!(config.get(".StopWhenCrouch") instanceof Boolean)) {errors.add("StopWhenCrouch"); errors.add(config.get(".StopWhenCrouch"));}
+		if(!(config.get(".FallDamage") instanceof Boolean)) {errors.add("FallDamage"); errors.add(config.get(".FallDamage"));}
+		if(!(config.get(".DeathMessage") instanceof String)) {errors.add("DeathMessage"); errors.add(config.get(".DeathMessage"));}
+		if(!(config.get(".RequirePermission") instanceof Boolean)) {errors.add("RequirePermission"); errors.add(config.get(".RequirePermission"));}
+		if(!(config.get(".IsBlockBlacklist") instanceof Boolean)) {errors.add("IsBlockBlacklist"); errors.add(config.get(".IsBlockBlacklist"));}
+		Object bounceBlocks = config.get(".BounceBlocks");
+		if(!(bounceBlocks instanceof List<?>)) {errors.add("BounceBlocks"); errors.add(bounceBlocks);
+		} else {for(String blockName : config.getStringList(".BounceBlocks")) {if(!checkBlock(blockName)) {errors.add("BounceBlocks_"); errors.add(blockName);}}}
+		if(!errors.isEmpty()) {plugin.canBounce = false; msg.errorMessage(sender, errors, isCommand);
+		} else {plugin.canBounce = true;}
+	}
+
+	public boolean checkBlock(String block) {
 		if(block.contains(":")) {
 			String[] blockSplit = block.split(":");
 			if(blockSplit.length > 2) {return false;}
@@ -30,44 +47,6 @@ public class ConfigManager {
 		return false;
 	}
 
-	public void checkConfig(CommandSender sender, Boolean isCommand) {
-		ArrayList<Object> errors = new ArrayList<>();
-		if(!(config.get(".WorldGuardFlags") instanceof Boolean)) {errors.add("WorldGuardFlags"); errors.add(config.get(".WorldGuardFlags"));}
-		if(!(config.get(".BounceForce") instanceof Double)) {errors.add("BounceForce"); errors.add(config.get(".BounceForce"));}
-		Object bounceSound = config.get(".BounceSound");
-		if(!(bounceSound instanceof String)) {
-			errors.add("BounceSound");
-			errors.add(bounceSound);
-		} else {
-			if(!checkSound(bounceSound.toString())) {
-				errors.add("BounceSound");
-				errors.add(bounceSound);
-			}
-		}
-		if(!(config.get(".StopWhenCrouch") instanceof Boolean)) {errors.add("StopWhenCrouch"); errors.add(config.get(".StopWhenCrouch"));}
-		if(!(config.get(".FallDamage") instanceof Boolean)) {errors.add("FallDamage"); errors.add(config.get(".FallDamage"));}
-		if(!(config.get(".DeathMessage") instanceof String)) {errors.add("DeathMessage"); errors.add(config.get(".DeathMessage"));}
-		if(!(config.get(".RequirePermission") instanceof Boolean)) {errors.add("RequirePermission"); errors.add(config.get(".RequirePermission"));}
-		if(!(config.get(".IsBlockBlacklist") instanceof Boolean)) {errors.add("IsBlockBlacklist"); errors.add(config.get(".IsBlockBlacklist"));}
-		Object bounceBlocks = config.get(".BounceBlocks");
-		if(!(bounceBlocks instanceof List<?>)) {
-			errors.add("BounceBlocks");
-			errors.add(bounceBlocks);
-		} else {
-			for(String blockName : config.getStringList(".BounceBlocks")) {
-				if(!checkBlock(blockName)) {
-					errors.add("BounceBlocks_");
-					errors.add(blockName);
-				}
-			}
-		}
-		if(!errors.isEmpty()) {
-			plugin.canBounce = false;
-			msg.errorMessage(sender, errors, isCommand);
-		} else {plugin.canBounce = true;}
-	}
-
-	//Check if Sound is valid
 	private boolean checkSound(String sound) {
 		if(sound.equalsIgnoreCase("NONE")) {return true;}
 		try {Sound.valueOf(sound);
@@ -75,8 +54,8 @@ public class ConfigManager {
 		return true;
 	}
 
-	// 0 = WorldGuardFlags | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage
-	// 5 = DeathMessage | 6 = RequirePermission | 7 = IsBlockBlackList | 8 = BounceBlocks
+	// 0 = Enabled | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage
+	// 5 = DeathMessage | 6 = RequirePermission | 7 = BounceBlocks | 8 = IsBlockBlackList
 	public ArrayList<Object> getConfigSettings() {
 		ArrayList<Object> configSettings = new ArrayList<>();
 		configSettings.add(config.getBoolean(".WorldGuardFlags"));
@@ -86,8 +65,8 @@ public class ConfigManager {
 		configSettings.add(config.getBoolean(".FallDamage"));
 		configSettings.add(config.getString(".DeathMessage"));
 		configSettings.add(config.getBoolean(".RequirePermission"));
-		configSettings.add(config.getBoolean(".IsBlockBlacklist"));
 		configSettings.add(config.getStringList(".BounceBlocks"));
+		configSettings.add(config.getBoolean(".IsBlockBlacklist"));
 		return configSettings;
 	}
 

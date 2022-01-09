@@ -9,7 +9,7 @@
 # 
 # --------------------------------------------------------------------------------------------------------
 # If the WorldGuard Flags are enabled or not. Once enabled you have to fully restart your server so the flags
-# can be registered in WorldGuard. (1.13+ Only)
+# can be registered in WorldGuard.
 WorldGuardFlags: false
 # --------------------------------------------------------------------------------------------------------
 
@@ -40,5 +40,9 @@ BounceBlocks:
    - BLUE_CONCRETE
 # If the blocklist above is a blacklist. When true you can bounce on every block except the ones above.
 IsBlockBlacklist: false
-# --------------------------------------------------------------------------------------------------------
-# By: CasieBarie || Source Code: https://github.com/CasieBarieDev/CasieBounce || Support: https://discord.gg/ZptCBHeHyg
+# -------------------------------------------------------------------------------------------------------------
+# - By: CasieBarie
+# - Source Code: https://github.com/CasieBarieDev/CasieBounce
+# - Support: https://discord.gg/ZptCBHeHyg
+# - Info: https://www.casiebariedev.ga/plugins/casiebounce
+# -------------------------------------------------------------------------------------------------------------
