@@ -19,6 +19,7 @@ import org.bukkit.util.Vector;
 
 import me.casiebarie.casiebounce.sqlite.Database;
 import me.casiebarie.casiebounce.utils.ConfigManager;
+import me.casiebarie.casiebounce.utils.PrizeManager;
 import me.casiebarie.casiebounce.worldguard.WorldGuardManager;
 import net.md_5.bungee.api.ChatColor;
 
@@ -26,15 +27,12 @@ public class Bounce implements Listener {
 	private Main plugin;
 	private WorldGuardManager wgM;
 	private ConfigManager cM;
+	private PrizeManager pM;
 	private Database db;
 	private ArrayList<UUID> isBouncing = new ArrayList<>(), canDie = new ArrayList<>();
-	public Bounce(Main plugin, WorldGuardManager wgM, ConfigManager cM) {
-		this.plugin = plugin;
-		this.wgM = wgM;
-		this.cM = cM;
-		this.db = plugin.getDatabase();
-		Bukkit.getPluginManager().registerEvents(this, plugin);
-		repeat();
+	public Bounce(Main plugin, WorldGuardManager wgM, ConfigManager cM, PrizeManager pM) {
+		this.plugin = plugin; this.wgM = wgM; this.cM = cM; this.pM = pM; this.db = plugin.getDatabase();
+		Bukkit.getPluginManager().registerEvents(this, plugin); repeat();
 	}
 
 	private void repeat() {
@@ -57,6 +55,7 @@ public class Bounce implements Listener {
 		player.setVelocity(new Vector(0, (double) finalSettings.get(1), 0));
 		player.setFallDistance(0);
 		try {player.playSound(player.getLocation(), Sound.valueOf((String) finalSettings.get(2)), 1f, 1f);} catch (Exception e) {}
+		pM.givePrize(player, finalSettings.get(3).toString());
 		plugin.mBounces += 1;
 		db.addBounces(region, player.getUniqueId(), player.getName(), player.getWorld(), 1);
 		isBouncing.add(player.getUniqueId());
@@ -70,9 +69,9 @@ public class Bounce implements Listener {
 		ArrayList<Object> finalSettings = new ArrayList<>();
 		finalSettings = getFinalSettings(player, cM.getConfigSettings());
 		if((finalSettings == null)) {return false;}
-		if(finalSettings.get(6).equals(true)) {if(!player.hasPermission("CB.bounce") && !player.hasPermission("CB.bounce." + wgM.getRegionName(player))) {return false;}}
-		if(player.isSneaking() && finalSettings.get(3).equals(true)) {return false;}
-		List<String> bounceBlocks = (List<String>) finalSettings.get(7);
+		if(finalSettings.get(7).equals(true)) {if(!player.hasPermission("CB.bounce") && !player.hasPermission("CB.bounce." + wgM.getRegionName(player))) {return false;}}
+		if(player.isSneaking() && finalSettings.get(4).equals(true)) {return false;}
+		List<String> bounceBlocks = (List<String>) finalSettings.get(8);
 		for(String blockName : bounceBlocks) {
 			if(blockName.contains(":")) {
 				String[] blockSplit = blockName.split(":");
@@ -81,8 +80,8 @@ public class Bounce implements Listener {
 			} else if (blockName.equalsIgnoreCase(block.getType().name())) {blockValid.add(true);
 			} else {blockValid.add(false);}
 		}
-		if(blockValid.contains(true)) {if(finalSettings.get(8).equals(false)) {return true; 
-		} else if(finalSettings.get(8).equals(true)) {return true;}}
+		if(blockValid.contains(true)) {if(finalSettings.get(9).equals(false)) {return true; 
+		} else if(finalSettings.get(9).equals(true)) {return true;}}
 		return false;
 	}
 
@@ -92,7 +91,7 @@ public class Bounce implements Listener {
 		if(configSettings.get(0).equals(true) && plugin.wgEnabled) {
 			regionSettings = wgM.getRegionSettings(player);
 			if(regionSettings.isEmpty() || regionSettings.get(0).equals(false)) {return null;}
-			for(int i = 0; i <= 8; i++) {finalSettings.add(i, (regionSettings.get(i).equals("DEFAULT") ? configSettings.get(i) : regionSettings.get(i)));}
+			for(int i = 0; i <= 9; i++) {finalSettings.add(i, (regionSettings.get(i).equals("DEFAULT") ? configSettings.get(i) : regionSettings.get(i)));}
 		} else {finalSettings = configSettings;}
 		return finalSettings;
 	}
@@ -106,7 +105,7 @@ public class Bounce implements Listener {
 		ArrayList<Object> finalSettings = new ArrayList<>();
 		finalSettings = getFinalSettings(player, cM.getConfigSettings());
 		if(finalSettings == null) {return;}
-		if(finalSettings.get(4).equals(false)) {e.setCancelled(true);}
+		if(finalSettings.get(5).equals(false)) {e.setCancelled(true);}
 		else {canDie.add(player.getUniqueId());}
 	}
 
@@ -116,8 +115,8 @@ public class Bounce implements Listener {
 		ArrayList<Object> finalSettings = new ArrayList<>();
 		finalSettings = getFinalSettings(player, cM.getConfigSettings());
 		if(finalSettings == null) {return;}
-		if(player.getLastDamageCause().getCause() == DamageCause.FALL && canDie.contains(player.getUniqueId()) && !finalSettings.get(5).toString().equals("")) {
-			String deathMessage = finalSettings.get(5).toString().replaceAll("%player%", player.getDisplayName());
+		if(player.getLastDamageCause().getCause() == DamageCause.FALL && canDie.contains(player.getUniqueId()) && !finalSettings.get(6).toString().equals("")) {
+			String deathMessage = finalSettings.get(6).toString().replaceAll("%player%", player.getDisplayName());
 			e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', deathMessage));
 		} canDie.remove(player.getUniqueId());
 	}

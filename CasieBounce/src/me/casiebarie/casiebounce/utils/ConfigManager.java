@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,58 +14,56 @@ public class ConfigManager {
 	private static FileConfiguration config;
 	private Main plugin;
 	private Messages msg;
-	public ConfigManager(Main plugin, Messages msg) {this.plugin = plugin; this.msg = msg; reloadConfig(null);}
+	private Checker checker;
+	private String defaultError(String setting, Object value, String type) {return "&cThe value '" + value + "' at setting '" + setting + "' cannot be recognized! &8(TYPE: " + type + ")";}
+	public ConfigManager(Main plugin, Messages msg, Checker checker) {this.plugin = plugin; this.msg = msg; this.checker = checker; reloadConfig(null);}
 	public void checkConfig(CommandSender sender, Boolean isCommand) {
-		ArrayList<Object> errors = new ArrayList<>();
-		if(!(config.get(".WorldGuardFlags") instanceof Boolean)) {errors.add("WorldGuardFlags"); errors.add(config.get(".WorldGuardFlags"));}
-		if(!(config.get(".BounceForce") instanceof Double)) {errors.add("BounceForce"); errors.add(config.get(".BounceForce"));}
+		ArrayList<String> errors = new ArrayList<>();
+		if(!(config.get(".WorldGuardFlags") instanceof Boolean)) {errors.add(defaultError("WorldGuardFlags", config.get(".WorldGuardFlags"), "Boolean"));}
+		if(!(config.get(".BounceForce") instanceof Double)) {errors.add(defaultError("BounceForce", config.get(".BounceForce"), "Double"));}
 		Object bounceSound = config.get(".BounceSound");
-		if(!(bounceSound instanceof String)) {errors.add("BounceSound"); errors.add(bounceSound);
-		} else {if(!checkSound(bounceSound.toString())) {errors.add("BounceSound"); errors.add(bounceSound);}}
-		if(!(config.get(".StopWhenCrouch") instanceof Boolean)) {errors.add("StopWhenCrouch"); errors.add(config.get(".StopWhenCrouch"));}
-		if(!(config.get(".FallDamage") instanceof Boolean)) {errors.add("FallDamage"); errors.add(config.get(".FallDamage"));}
-		if(!(config.get(".DeathMessage") instanceof String)) {errors.add("DeathMessage"); errors.add(config.get(".DeathMessage"));}
-		if(!(config.get(".RequirePermission") instanceof Boolean)) {errors.add("RequirePermission"); errors.add(config.get(".RequirePermission"));}
-		if(!(config.get(".IsBlockBlacklist") instanceof Boolean)) {errors.add("IsBlockBlacklist"); errors.add(config.get(".IsBlockBlacklist"));}
+		if(!(bounceSound instanceof String)) {errors.add(defaultError("BounceSound", bounceSound, "String"));
+		} else {if(!checker.checkSound(bounceSound.toString())) {errors.add("&cThe sound `" + bounceSound + "` in `BounceSound` is not a valid sound! &8Refer to https://helpch.at/docs/" + Main.bukkitVersion + "/index.html?org/bukkit/Sound.html for valid ids");}}
+		Object bouncePrize = config.get(".BouncePrize");
+		if(!(bouncePrize instanceof String)) {errors.add(defaultError("BouncePrize", bouncePrize, "String"));
+		} else {
+			String start = "&cThe value '" + bouncePrize + "' at setting 'BouncePrize' cannot be recognized! ";
+			switch (checker.checkPrize(bouncePrize.toString())) {
+			case 0: break;
+			case 1: errors.add(start + "Please use 'TYPE@VALUE'!"); break;
+			case 2: errors.add(start + "Please use MONEY, ITEM or PERMISSION!"); break;
+			case 3: errors.add(start + "Please use a Double as value!"); break;
+			case 4: errors.add(start + "Material is not recognized! &8Please refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids"); break;
+			case 5: errors.add(start + "Vault is not enabled!"); break;
+			default: errors.add(start + "I dont know why! (please contact CasieBarie for help)");}
+		}
+		if(!(config.get(".StopWhenCrouch") instanceof Boolean)) {errors.add(defaultError("StopWhenCrouch", config.get(".StopWhenCrouch"), "Boolean"));}
+		if(!(config.get(".FallDamage") instanceof Boolean)) {errors.add(defaultError("FallDamage", config.get(".FallDamage"), "Boolean"));}
+		if(!(config.get(".DeathMessage") instanceof String)) {errors.add(defaultError("DeathMessage", config.get(".DeathMessage"), "String"));}
+		if(!(config.get(".RequirePermission") instanceof Boolean)) {errors.add(defaultError("RequirePermission", config.get(".RequirePermission"), "Boolean"));}
 		Object bounceBlocks = config.get(".BounceBlocks");
-		if(!(bounceBlocks instanceof List<?>)) {errors.add("BounceBlocks"); errors.add(bounceBlocks);
-		} else {for(String blockName : config.getStringList(".BounceBlocks")) {if(!checkBlock(blockName)) {errors.add("BounceBlocks_"); errors.add(blockName);}}}
-		if(!errors.isEmpty()) {plugin.canBounce = false; msg.errorMessage(sender, errors, isCommand);
-		} else {plugin.canBounce = true;}
+		if(!(bounceBlocks instanceof List<?>)) {errors.add(defaultError("BounceBlocks", bounceBlocks, "List"));
+		} else {for(String blockName : config.getStringList(".BounceBlocks")) {if(!checker.checkBlock(blockName)) {errors.add("&cThe block `" + blockName + "` in `BounceBlocks` is not a valid block! &8Refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids");}}}
+		if(!(config.get(".IsBlockBlacklist") instanceof Boolean)) {errors.add(defaultError("IsBlockBlacklist", config.get(".IsBlockBlacklist"), "Boolean"));}
+		if(errors.isEmpty()) {plugin.canBounce = true;
+		} else {plugin.canBounce = false; msg.errorMessage(sender, errors, isCommand);}
 	}
 
-	public boolean checkBlock(String block) {
-		if(block.contains(":")) {
-			String[] blockSplit = block.split(":");
-			if(blockSplit.length > 2) {return false;}
-			try {Byte.parseByte(blockSplit[1]);
-			} catch (NumberFormatException e) {return false;}
-			if(Material.getMaterial(blockSplit[0]) != null) {return true;}
-		} else if(Material.getMaterial(block) != null) {return true;}
-		return false;
-	}
-
-	private boolean checkSound(String sound) {
-		if(sound.equalsIgnoreCase("NONE")) {return true;}
-		try {Sound.valueOf(sound);
-		} catch (IllegalArgumentException e) {return false;}
-		return true;
-	}
-
-	// 0 = Enabled | 1 = BounceForce | 2 = BounceSound | 3 = StopWhenCrouch | 4 = FallDamage
-	// 5 = DeathMessage | 6 = RequirePermission | 7 = BounceBlocks | 8 = IsBlockBlackList
+	// 0 = WorldGuardEnabled | 1 = BounceForce | 2 = BounceSound | 3 = BouncePrize | 4 = StopWhenCrouch
+	// 5 = FallDamage | 6 = DeathMessage | 7 = RequirePermission | 8 = BounceBlocks | 9 = IsBlockBlackList
 	public ArrayList<Object> getConfigSettings() {
-		ArrayList<Object> configSettings = new ArrayList<>();
-		configSettings.add(config.getBoolean(".WorldGuardFlags"));
-		configSettings.add(config.getDouble(".BounceForce"));
-		configSettings.add(config.getString(".BounceSound"));
-		configSettings.add(config.getBoolean(".StopWhenCrouch"));
-		configSettings.add(config.getBoolean(".FallDamage"));
-		configSettings.add(config.getString(".DeathMessage"));
-		configSettings.add(config.getBoolean(".RequirePermission"));
-		configSettings.add(config.getStringList(".BounceBlocks"));
-		configSettings.add(config.getBoolean(".IsBlockBlacklist"));
-		return configSettings;
+		ArrayList<Object> configSettingsLiss = new ArrayList<>();
+		configSettingsLiss.add(config.getBoolean(".WorldGuardFlags"));
+		configSettingsLiss.add(config.getDouble(".BounceForce"));
+		configSettingsLiss.add(config.getString(".BounceSound"));
+		configSettingsLiss.add(config.getString(".BouncePrize"));
+		configSettingsLiss.add(config.getBoolean(".StopWhenCrouch"));
+		configSettingsLiss.add(config.getBoolean(".FallDamage"));
+		configSettingsLiss.add(config.getString(".DeathMessage"));
+		configSettingsLiss.add(config.getBoolean(".RequirePermission"));
+		configSettingsLiss.add(config.getStringList(".BounceBlocks"));
+		configSettingsLiss.add(config.getBoolean(".IsBlockBlacklist"));
+		return configSettingsLiss;
 	}
 
 	public void reloadConfig(CommandSender sender) {

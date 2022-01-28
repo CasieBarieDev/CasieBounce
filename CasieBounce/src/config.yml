@@ -20,6 +20,9 @@ BounceForce: 0.7
 # The sound that will be played when you bounce. (Set to NONE to disable)
 BounceSound: BLOCK_SLIME_HIT
 
+# Give the player a prize when they bounce! (Use TYPE@VALUE) <MONEY/ITEM/PERMISSION> (Set to NONE to disable)
+BouncePrize: ITEM@DIAMOND
+
 # Whether you will stop bouncing when you crouch.
 StopWhenCrouch: true
 

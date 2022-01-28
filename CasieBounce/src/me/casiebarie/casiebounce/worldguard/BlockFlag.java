@@ -13,7 +13,7 @@ public class BlockFlag extends MaterialFlag {
 		Material material;
 		if(input.contains(":")) {material = Material.matchMaterial(input.split(":")[0]);
 		} else {material = Material.matchMaterial(input);}
-		if(!material.isBlock()) {throw new InvalidFlagFormat("This material isn't seen as 'placable block', use alternative id");}
+		if(!material.isBlock()) {throw new InvalidFlagFormat("This material isn't seen as a 'placable block', use alternative id");}
 		return input;
 	}
 }

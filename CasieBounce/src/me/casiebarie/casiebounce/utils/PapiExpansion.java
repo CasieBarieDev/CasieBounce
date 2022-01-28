@@ -76,8 +76,7 @@ public class PapiExpansion extends PlaceholderExpansion {
 			case "BOTH-ROUNDED":
 				values = map.get(map.keySet().toArray()[position]);
 				return values.get(0) + ": " + rounded(Integer.parseInt(values.get(1)), true);
-			default: break;}
-			return "";
+			default: return "";}
 		} catch (ArrayIndexOutOfBoundsException e) {return "";}
 	}
 

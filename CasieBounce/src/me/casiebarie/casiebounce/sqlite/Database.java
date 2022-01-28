@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -88,6 +89,28 @@ public abstract class Database {
 		} finally {doFinally(ps, conn);} return null;
 	}
 
+	public List<String> getCompletions(String mode, String data) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<String> completions = new ArrayList<>();
+		try {
+			conn = getSQLConnection();
+			ps = conn.prepareStatement("SELECT * FROM " + table);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				String[] regionPlayer = rs.getString(1).split(",");
+				String world = rs.getString(3);
+				switch (mode) {
+				case "PLAYER": if(!completions.contains(rs.getString(2) + "(" + regionPlayer[1] + ")")) {completions.add(rs.getString(2) + "(" + regionPlayer[1] + ")");} break;
+				case "REGION": if(!completions.contains(regionPlayer[0] + ":" + world)) {completions.add(regionPlayer[0] + ":" + world);} break;
+				case "REGIONPLAYER": if(regionPlayer[0].equals(data.split(":")[0]) && rs.getString(3).equals(data.split(":")[1])) {if(!completions.contains(rs.getString(2) + "(" + regionPlayer[1] + ")")) {completions.add(rs.getString(2) + "(" + regionPlayer[1] + ")");}} break;
+				default: break;}
+			} return completions;
+		} catch (Exception e) {plugin.getLogger().log(Level.SEVERE, sqlConnectionExecute(), e);
+		} finally {doFinally(ps, conn);} return null;
+	}
+
 	public void addBounces(String region, UUID uuid, String playerName, World world, Integer bounces) {
 		String regionPlayer = region + "," + uuid.toString();
 		Integer newBounces = bounces + getBounces("PLAYERREGION", regionPlayer, world.getName());
@@ -104,5 +127,21 @@ public abstract class Database {
 			return;
 		} catch (SQLException e) {plugin.getLogger().log(Level.SEVERE, sqlConnectionExecute(), e);
 		} finally {doFinally(ps, conn);} return;
+	}
+
+	public void resetData(String type, String region, String player, String world) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		try {
+			conn = getSQLConnection();
+			switch (type) {
+			case "REGIONPLAYER": ps = conn.prepareStatement("DELETE FROM " + table + " WHERE regionplayer=`" + region + "," + player + "` AND world=`" + world + "';"); break;
+			case "REGION": ps = conn.prepareStatement("DELETE FROM " + table + " WHERE regionplayer LIKE '" + region + ",%' AND world=`" + world + "`;"); break;
+			case "PLAYER": ps = conn.prepareStatement("DELETE FROM " + table + " WHERE regionplayer LIKE '%," + player + "';"); break;
+			case "ALL": ps = conn.prepareStatement("DELETE FROM " + table);
+			default: break;}
+			ps.executeUpdate();
+		} catch (SQLException e) {plugin.getLogger().log(Level.SEVERE, sqlConnectionExecute(), e);
+		} finally {doFinally(ps, conn);}
 	}
 }

@@ -12,38 +12,43 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
-import me.casiebarie.casiebounce.sqlite.Database;
-import me.casiebarie.casiebounce.sqlite.SQLite;
-import me.casiebarie.casiebounce.utils.Commands;
-import me.casiebarie.casiebounce.utils.ConfigManager;
-import me.casiebarie.casiebounce.utils.Messages;
-import me.casiebarie.casiebounce.utils.Metrics;
-import me.casiebarie.casiebounce.utils.PapiExpansion;
-import me.casiebarie.casiebounce.utils.UpdateChecker;
+import me.casiebarie.casiebounce.sqlite.*;
+import me.casiebarie.casiebounce.utils.*;
 import me.casiebarie.casiebounce.worldguard.WorldGuardManager;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 public class Main extends JavaPlugin {
 	private Database db;
 	public Database getDatabase() {return db;}
-	public static WorldGuardPlugin worldGuardPlugin;
-	public static ConfigManager cM;
-	public WorldGuardManager wgM;
+	public WorldGuardPlugin worldGuardPlugin;
+	public static Economy econ;
+	public static Permission perm;
+	public static Checker checker;
+	private ConfigManager cM;
+	private WorldGuardManager wgM;
 	public boolean canBounce, isLegacy, wgEnabled, wgError;
+	public static String bukkitVersion;
 	public int mBounces;
 	private FileConfiguration config;
+	public boolean papiPresent() {if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {return true;} else {return false;}}
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 		db = new SQLite(this);
 		db.load();
+		checker = new Checker(this);
+		ResetData rD = new ResetData(this);
 		Messages msg = new Messages(this, wgM);
-		cM = new ConfigManager(this, msg);
-		new Commands(this, cM, msg);
-		new Bounce(this, wgM, cM);
+		cM = new ConfigManager(this, msg, checker);
+		PrizeManager pM = new PrizeManager(this);
+		new Commands(this, db, cM, msg, rD);
+		new Bounce(this, wgM, cM, pM);
 		if(papiPresent()) {new PapiExpansion(this, db).register();}
 		new UpdateChecker(this, 90967, "CB.admin").checkForUpdate();
 		Metrics metrics = new Metrics(this, 13216);
@@ -64,6 +69,16 @@ public class Main extends JavaPlugin {
 		wgM = new WorldGuardManager(this);
 		wgM.registerFlags();
 	}
+	
+	public void legacyCheck() {
+		final String bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
+		Main.bukkitVersion = bukkitVersion.replaceFirst("_", ".").split("_")[0];
+		final List<String> legacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
+		final List<String> versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3", "1_17_R1", "1_17_R2", "1_18_R1", "1_18_R2");
+		if(legacyVersions.contains(bukkitVersion)) {isLegacy = true;
+		} else if(versions.contains(bukkitVersion)) {isLegacy = false;
+		} else {getLogger().severe("Incompatible version. Disabling plugin"); getServer().getPluginManager().disablePlugin(this);}
+	}
 
 	public WorldGuardPlugin getWorldGuard() {
 		Plugin plugin = this.getServer().getPluginManager().getPlugin("WorldGuard");
@@ -71,14 +86,13 @@ public class Main extends JavaPlugin {
 		return (WorldGuardPlugin) plugin;
 	}
 
-	public boolean papiPresent() {if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {return true;} else {return false;}}
-	public void legacyCheck() {
-		final String BukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
-		final List<String> LegacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
-		final List<String> Versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3", "1_17_R1", "1_17_R2", "1_18_R1", "");
-		if(LegacyVersions.contains(BukkitVersion)) {isLegacy = true;
-		} else if(Versions.contains(BukkitVersion)) {isLegacy = false;
-		} else {getLogger().severe("Incompatible version. Disabling plugin"); getServer().getPluginManager().disablePlugin(this);}
+	public boolean vaultPresent() {
+		if(getServer().getPluginManager().getPlugin("Vault") == null) {return false;}
+		RegisteredServiceProvider<Economy> rspE = getServer().getServicesManager().getRegistration(Economy.class);
+		RegisteredServiceProvider<Permission> rspP = getServer().getServicesManager().getRegistration(Permission.class);
+		if(rspE == null || rspP == null) {return false;}
+		Main.econ = rspE.getProvider(); Main.perm = rspP.getProvider();
+		return true;
 	}
 
 	private void createCharts(Metrics metrics) {
@@ -94,7 +108,7 @@ public class Main extends JavaPlugin {
 				@SuppressWarnings("unchecked")
 				List<String> configBounceBlocks = (List<String>) cM.getConfigSettings().get(7);
 				for(String blockName : configBounceBlocks) {
-					if(!cM.checkBlock(blockName)) {continue;}
+					if(!checker.checkBlock(blockName)) {continue;}
 					if(!bounceBlocks.contains(blockName.toUpperCase())) {bounceBlocks.add(blockName.toUpperCase());}
 				} for(String bounceBlock : bounceBlocks) {valueMap.put(bounceBlock, 1);} return valueMap;
 			}

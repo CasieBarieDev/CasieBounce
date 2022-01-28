@@ -1,10 +1,10 @@
 name: CasieBounce
 author: CasieBarie
 website: https://www.casiebariedev.ga/
-version: 6.0
+version: 6.1
 api-version: 1.13
 main: me.casiebarie.casiebounce.Main
-softdepend: [WorldGuard, PlaceholderAPI]
+softdepend: [WorldGuard, PlaceholderAPI, Vault]
 commands:
    CB:
       description: Command of CasieBounce.

@@ -21,7 +21,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
-
+@SuppressWarnings("deprecation")
 public class UpdateChecker implements Listener {
 	private Main plugin;
 	private Integer recourceID;
@@ -31,12 +31,10 @@ public class UpdateChecker implements Listener {
 	private static String LastSpigotVersion, spigotVersion, currVersion;
 	private void send(String msg) {Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', msg));}
 	public UpdateChecker(Main plugin, Integer recourceID, String permission) {
-		this.plugin = plugin;
-		this.recourceID = recourceID;
-		this.permission = permission;
+		this.plugin = plugin; this.recourceID = recourceID; this.permission = permission;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
-	
+
 	public void checkForUpdate() {
 		currVersion = plugin.getDescription().getVersion();
 		Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
@@ -44,7 +42,7 @@ public class UpdateChecker implements Listener {
 			if(spigotVersion == null) {return;}
 			int spigotVersionINT = Integer.parseInt(spigotVersion.replaceAll("\\.", ""));
 			int currVersionINT = Integer.parseInt(currVersion.replaceAll("\\.", ""));
-			if(currVersionINT == spigotVersionINT && firstCheck) {plugin.getLogger().info(String.format("You are using the most recent version. (v%s)", currVersion)); firstCheck = false; return;}
+			if((currVersionINT == spigotVersionINT)) {if(firstCheck) {plugin.getLogger().info(String.format("You are using the most recent version. (v%s)", currVersion)); firstCheck = false;} return;}
 			if(LastSpigotVersion == spigotVersion) {return;}
 			LastSpigotVersion = spigotVersion;
 			List<String> lines = new ArrayList<>();
@@ -67,13 +65,13 @@ public class UpdateChecker implements Listener {
 			printToConsole(lines);
 		}, 20l, 72000l);
 	}
-	
+
 	private void getLatestVersion(final Consumer<String> consumer) {
 		try(InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + recourceID).openStream(); Scanner scanner = new Scanner(inputStream)) {
 			if(scanner.hasNext()) {consumer.accept(scanner.next());}
 		} catch (Exception e) {plugin.getLogger().info("Failed to check for updates: " + e.getMessage());}
 	}
-	
+
 	private void printToConsole(List<String> lines) {
 		int longestLine = 0;
 		for(String line : lines) {longestLine = Math.max(line.length(), longestLine);}
@@ -86,7 +84,6 @@ public class UpdateChecker implements Listener {
 		send("&e" + stringBuilder.toString());
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {

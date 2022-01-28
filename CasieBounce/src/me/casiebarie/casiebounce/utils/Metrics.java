@@ -165,20 +165,15 @@ public class Metrics {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			try(GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {gzip.write(str.getBytes(StandardCharsets.UTF_8));}
 			return outputStream.toByteArray();}
-		private final String platform;
-		private final String serverUuid;
+		private final String platform, serverUuid;
 		private final int serviceId;
-		private final Consumer<JsonObjectBuilder> appendPlatformDataConsumer;
-		private final Consumer<JsonObjectBuilder> appendServiceDataConsumer;
+		private final Consumer<JsonObjectBuilder> appendPlatformDataConsumer, appendServiceDataConsumer;
 		private final Consumer<Runnable> submitTaskConsumer;
 		private final Supplier<Boolean> checkServiceEnabledSupplier;
 		private final BiConsumer<String, Throwable> errorLogger;
 		private final Consumer<String> infoLogger;
-		private final boolean logErrors;
-		private final boolean logSentData;
-		private final boolean logResponseStatusText;
+		private final boolean logErrors, logSentData, logResponseStatusText, enabled;
 		private final Set<CustomChart> customCharts = new HashSet<>();
-		private final boolean enabled;
 		public MetricsBase(String platform, String serverUuid, int serviceId, boolean enabled, Consumer<JsonObjectBuilder> appendPlatformDataConsumer, Consumer<JsonObjectBuilder> appendServiceDataConsumer,
 			Consumer<Runnable> submitTaskConsumer, Supplier<Boolean> checkServiceEnabledSupplier, BiConsumer<String, Throwable> errorLogger, Consumer<String> infoLogger,
 			boolean logErrors, boolean logSentData, boolean logResponseStatusText) {

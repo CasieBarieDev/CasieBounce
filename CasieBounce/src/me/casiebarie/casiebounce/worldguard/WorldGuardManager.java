@@ -36,7 +36,7 @@ public class WorldGuardManager {
 	private static DoubleFlag CB_BOUNCEFORCE;
 	private static StringFlag CB_DEATHMESSAGE;
 	private static SetFlag<Sound> CB_BOUNCESOUND;
-	private static SetFlag<String> CB_BOUNCEBLOCKS;
+	private static SetFlag<String> CB_BOUNCEBLOCKS, CB_BOUNCEPRIZE;
 	private static BooleanFlag CB_ENABLED, CB_STOPWHENCROUCH, CB_REQUIREPERMISSION, CB_ISBLOCKBLACKLIST, CB_FALLDAMAGE;
 	public WorldGuardManager(Main plugin) {this.plugin = plugin; l = plugin.isLegacy;}
 	@SuppressWarnings("unchecked")
@@ -70,6 +70,14 @@ public class WorldGuardManager {
 			} catch (FlagConflictException e) {
 				Flag<?> existing = registry.get("cb-bouncesound");
 				if(existing instanceof SetFlag<?>) {CB_BOUNCESOUND = (SetFlag<Sound>) existing;}
+			}
+			try {
+				SetFlag<String> flag = new SetFlag<>("cb-bounceprize", new PrizeFlag(null));
+				registry.register(flag);
+				CB_BOUNCEPRIZE = flag;
+			} catch (FlagConflictException e) {
+				Flag<?> existing = registry.get("cb-bounceprize");
+				if(existing instanceof SetFlag<?>) {CB_BOUNCEPRIZE = (SetFlag<String>) existing;}
 			}
 			try {
 				BooleanFlag flag = new BooleanFlag("cb-falldamage");
@@ -122,8 +130,7 @@ public class WorldGuardManager {
 		} catch (Exception e) {
 			plugin.getLogger().log(Level.SEVERE, "Failed to (re)create WorldGuard flags!");
 			plugin.getLogger().log(Level.SEVERE, "Due to a reload the WorldGuard flags are disabled. Please fully restart your server to fix it!");
-			plugin.wgEnabled = false;
-			plugin.wgError = true;
+			plugin.wgEnabled = false; plugin.wgError = true;
 			for(Player player : Bukkit.getOnlinePlayers()) {if(player.hasPermission("CB.admin")) {player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6[&bCasieBounce&6] &cDue to a reload the WorldGuard flags are disabled. Please fully restart your server to fix it!"));}}
 		}
 	}
@@ -138,6 +145,7 @@ public class WorldGuardManager {
 		Boolean enabled = null, stopWhenCrouch = null, requirePermission = null, isBlockBlacklist = null, fallDamage = null;
 		Double bounceForce = null;
 		Set<Sound> bounceSound = null;
+		Set<String> prize = null;
 		String deathMessage = null;
 		Collection<Set<String>> wgBounceBlocks = null;
 		try {
@@ -149,11 +157,13 @@ public class WorldGuardManager {
 			bounceSound = set.queryValue(localPlayer, CB_BOUNCESOUND);
 			fallDamage = set.queryValue(localPlayer, CB_FALLDAMAGE);
 			deathMessage = set.queryValue(localPlayer, CB_DEATHMESSAGE);
+			prize = set.queryValue(localPlayer, CB_BOUNCEPRIZE);
 			wgBounceBlocks = set.queryAllValues(localPlayer, CB_BOUNCEBLOCKS);
 		} catch (NullPointerException e) {}
 		regionSettings.add((enabled != null) ? enabled : false);
 		regionSettings.add((bounceForce != null) ? bounceForce : d);
 		regionSettings.add((bounceSound != null) ? bounceSound.toString().replaceAll("[\\[\\]]", "") : d);
+		regionSettings.add((prize != null) ? prize : d);
 		regionSettings.add((stopWhenCrouch != null) ? stopWhenCrouch : d);
 		regionSettings.add((fallDamage != null) ? fallDamage : d);
 		regionSettings.add((deathMessage != null) ? deathMessage : d);
@@ -173,7 +183,7 @@ public class WorldGuardManager {
 			RegionManager regions = getRegionManager(world);
 			Map<String, ProtectedRegion> regionMap = regions.getRegions();
 			for(Entry<String, ProtectedRegion> regionEntry : regionMap.entrySet()) {
-				if(regionEntry.getValue().getFlag(CB_ENABLED).booleanValue()) {regionAmount += 1;}
+				if(regionEntry.getValue().getFlag(CB_ENABLED).booleanValue()) {regionAmount++;}
 			}
 		} return "" + regionAmount;
 	}
