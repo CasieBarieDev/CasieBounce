@@ -1,0 +1,2 @@
+# ✨ CasieBounce ✨
+<p <a href="https://www.spigotmc.org/resources/.90967/"><img src="https://img.shields.io/spiget/downloads/90967?label=DOWNLOAD&amp;plastic" alt="Spiget Downloads" /></a> <a href="https://github.com/CasieBarieDev/CasieBounce"><img src="https://img.shields.io/github/license/casiebariedev/CasieBounce?label=GITHUB&amp;logo=github&amp;plastic" alt="GitHub" /></a> <img src="https://img.shields.io/spiget/version/90967?label=%20&amp;plastic" alt="Spiget Version" /><img src="https://img.shields.io/spiget/stars/90967?label=%20&amp;plastic" alt="Spiget Stars" /></p>
