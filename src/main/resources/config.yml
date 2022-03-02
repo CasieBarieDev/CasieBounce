@@ -1,0 +1,52 @@
+#   /$$$$$$                      /$$           /$$$$$$$
+#  /$$__  $$                    |__/          | $$__  $$
+# | $$  \__/  /$$$$$$   /$$$$$$$ /$$  /$$$$$$ | $$  \ $$  /$$$$$$  /$$   /$$ /$$$$$$$   /$$$$$$$  /$$$$$$
+# | $$       |____  $$ /$$_____/| $$ /$$__  $$| $$$$$$$  /$$__  $$| $$  | $$| $$__  $$ /$$_____/ /$$__  $$
+# | $$        /$$$$$$$|  $$$$$$ | $$| $$$$$$$$| $$__  $$| $$  \ $$| $$  | $$| $$  \ $$| $$      | $$$$$$$$
+# | $$    $$ /$$__  $$ \____  $$| $$| $$_____/| $$  \ $$| $$  | $$| $$  | $$| $$  | $$| $$      | $$_____/
+# |  $$$$$$/|  $$$$$$$ /$$$$$$$/| $$|  $$$$$$$| $$$$$$$/|  $$$$$$/|  $$$$$$/| $$  | $$|  $$$$$$$|  $$$$$$$
+#  \______/  \_______/|_______/ |__/ \_______/|_______/  \______/  \______/ |__/  |__/ \_______/ \_______/
+#
+# --------------------------------------------------------------------------------------------------------
+# If the WorldGuard Flags are enabled or not. Once enabled you have to fully restart your server so the flags
+# can be registered in WorldGuard.
+WorldGuardFlags: false
+# --------------------------------------------------------------------------------------------------------
+
+# ------------------------------------------- DEFAULT SETTINGS -------------------------------------------
+# How high you will bounce, just experiment with it :)
+BounceForce: 0.7
+
+# The sound that will be played when you bounce. Add CUSTOM: at the start for custom sounds (Set to NONE to disable)
+BounceSound: BLOCK_SLIME_HIT
+
+# Give the player a prize when they bounce! (Use TYPE@VALUE) <MONEY/ITEM/PERMISSION/COMMAND> (Set to NONE to disable)
+# Command variables: %player%, %X%, %Y%, %Z%, %PITCH%, %YAW%.
+BouncePrize: ITEM@DIAMOND
+
+# Whether you will stop bouncing when you crouch.
+StopWhenCrouch: true
+
+# Whether you take FallDamage.
+FallDamage: false
+# The death message. (Color codes supported)
+DeathMessage: '%player% fell while bouncing'
+
+# Whether you need the permission CB.bounce.
+RequirePermission: false
+
+# The blocks where you can bounce on.  (Legacy use: WOOL:1 || 1.13+ use: ORANGE_WOOL)
+BounceBlocks:
+  - WOOL:1
+  - CONCRETE:11
+
+  - ORANGE_WOOL
+  - BLUE_CONCRETE
+# If the blocklist above is a blacklist. When true you can bounce on every block except the ones above.
+IsBlockBlacklist: false
+# -------------------------------------------------------------------------------------------------------------
+# - By: CasieBarie
+# - Source Code: https://github.com/CasieBarieDev/CasieBounce
+# - Support: https://discord.gg/ZptCBHeHyg
+# - Info: https://www.casiebariedev.ga/plugins/casiebounce
+# -------------------------------------------------------------------------------------------------------------

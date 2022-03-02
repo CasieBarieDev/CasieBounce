@@ -1,0 +1,23 @@
+name: CasieBounce
+author: CasieBarie
+website: https://www.casiebariedev.ga/
+version: 6.2
+api-version: 1.13
+main: me.casiebarie.casiebounce.Main
+softdepend: [WorldGuard, PlaceholderAPI, Vault]
+commands:
+  CB:
+    description: Command of CasieBounce.
+    permission: CB.admin
+permissions:
+  CB.*:
+    description: All permissions.
+    children:
+      CB.admin: true
+      CB.bounce: true
+  CB.admin:
+    description: Allows you to reload the config.
+    default: op
+  CB.bounce:
+    description: Allows you to bounce.
+    default: op
