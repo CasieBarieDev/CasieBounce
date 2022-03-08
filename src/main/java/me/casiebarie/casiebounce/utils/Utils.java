@@ -1,14 +1,28 @@
 package me.casiebarie.casiebounce.utils;
 
 import me.casiebarie.casiebounce.Main;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @SuppressWarnings("deprecation")
-public class Checker {
+public class Utils {
 	final Main plugin;
-	public Checker(Main plugin) {this.plugin = plugin;}
+	public Utils(Main plugin) {this.plugin = plugin;}
+
+	public String hex(String msg) {
+		Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+		Matcher matcher = pattern.matcher(msg);
+		while(matcher.find()) {
+			String color = msg.substring(matcher.start(), matcher.end());
+			msg = msg.replace(color, ChatColor.of(color) + "");
+			matcher = pattern.matcher(msg);
+		} return ChatColor.translateAlternateColorCodes('&', msg);
+	}
 
 	public boolean checkBlock(String block) {
 		ItemStack itemStack;

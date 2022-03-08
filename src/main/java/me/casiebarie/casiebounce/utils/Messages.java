@@ -1,7 +1,7 @@
 package me.casiebarie.casiebounce.utils;
 
 import me.casiebarie.casiebounce.Main;
-import me.casiebarie.casiebounce.worldguard.WorldGuardManager;
+import me.casiebarie.casiebounce.WorldGuardManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ClickEvent.Action;
@@ -18,11 +18,10 @@ import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
 public class Messages implements Listener {
-	final Main plugin;
-	final WorldGuardManager wgM;
+	final Main plugin; final WorldGuardManager wgM;
 	public void send(CommandSender sender, String message) {if(sender != null) {sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));}}
 	private ComponentBuilder flags() {return new ComponentBuilder("").append("§d* cb-enabled\n§d* cb-bounceforce\n§d* cb-bouncesound\n§d* cb-bounceprize\n§d* cb-stopwhencrouch\n§d* cb-falldamage\n§d* cb-deathmessage\n§d* cb-requirepermission\n§d* cb-bounceblocks\n§d* cb-isblockblacklist");}
-	public ComponentBuilder startMSG() {return new ComponentBuilder("§6<§9#§6> -------------> ").append("§b§lCasieBounce §3§lv" + plugin.getDescription().getVersion()).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§9By: §eCasieBarie").create())).append("§6 <------------- §6<§9#§6>").event((HoverEvent) null);}
+	private ComponentBuilder startMSG() {return new ComponentBuilder("§6<§9#§6> -------------> ").append("§b§lCasieBounce §3§lv" + plugin.getDescription().getVersion()).event(new HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§9By: §eCasieBarie").create())).append("§6 <------------- §6<§9#§6>").event((HoverEvent) null);}
 	public String endMSG = "\n§6<§9#§6> ---------------------------------------------- <§9#§6>";
 	public Messages(Main plugin, WorldGuardManager wgM) {this.plugin = plugin; this.wgM = wgM; Bukkit.getPluginManager().registerEvents(this, plugin);}
 
@@ -32,13 +31,20 @@ public class Messages implements Listener {
 		return builder.toString();
 	}
 
-	private String colorSetting(Object setting, String type) {
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		Player player = e.getPlayer();
+		if(!plugin.canBounce && player.hasPermission("CB.admin")) {getErrorMSG(player);}
+		if(plugin.wgError && player.hasPermission("CB.admin")) {send(player, "&6[&bCasieBounce&6] &cDue to a reload the WorldGuard flags are disabled. Please fully restart your server to fix it!");}
+	}
+
+	private String colorSetting(Object setting, int type) {
 		if(setting.equals("DEFAULT")) {return "§8§oDEFAULT";}
 		switch (type) {
-		case "BOOLEAN": return (setting.toString().equals("true")) ? "§a§oTrue" : "§c§oFalse";
-		case "INT": return "§e§o" + setting;
-		case "OBJECT": return "§9§o" + setting;
-		case "STRING": return "§f§o" + setting;
+		case 1: return (setting.toString().equals("true")) ? "§a§oTrue" : "§c§oFalse";
+		case 2: return "§e§o" + setting;
+		case 3: return "§9§o" + setting;
+		case 4: return "§f§o" + setting;
 		default: return "";}
 	}
 
@@ -84,13 +90,6 @@ public class Messages implements Listener {
 		.create());
 	}
 
-	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
-		Player player = e.getPlayer();
-		if(!plugin.canBounce && player.hasPermission("CB.admin")) {getErrorMSG(player);}
-		if(plugin.wgError && player.hasPermission("CB.admin")) {send(player, "&6[&bCasieBounce&6] &cDue to a reload the WorldGuard flags are disabled. Please fully restart your server to fix it!");}
-	}
-
 	public void regionInfo(Player player) {
 		if(!plugin.wgEnabled) {send(player, "&6[&bCasieBounce&6] &cWorldGuard is not enabled!"); return;}
 		ArrayList<Object> regionSettings = wgM.getRegionSettings(player);
@@ -99,16 +98,16 @@ public class Messages implements Listener {
 		player.spigot().sendMessage(startMSG()
 			.append("\n§3§lREGION SETTINGS:\n")
 			.append("§5Region | §f" + regionName)
-			.append("\n\n§5Enabled | " + colorSetting(regionSettings.get(0), "BOOLEAN"))
-			.append("\n§5BounceForce | " + colorSetting(regionSettings.get(1), "INT"))
-			.append("\n§5BounceSound | " + colorSetting(regionSettings.get(2), "OBJECT"))
-			.append("\n§5BouncePrize | " + colorSetting(regionSettings.get(3), "STRING"))
-			.append("\n§5StopWhenCrouch | " + colorSetting(regionSettings.get(4), "BOOLEAN"))
-			.append("\n§5FallDamage | " + colorSetting(regionSettings.get(5), "BOOLEAN"))
-			.append("\n§5DeathMessage | " + colorSetting(regionSettings.get(6), "STRING"))
-			.append("\n§5RequirePermission | " + colorSetting(regionSettings.get(7), "BOOLEAN"))
-			.append("\n§5BounceBlocks | " + colorSetting(regionSettings.get(8), "OBJECT"))
-			.append("\n§5IsBlockBlackList | " + colorSetting(regionSettings.get(9), "BOOLEAN"))
+			.append("\n\n§5Enabled | " + colorSetting(regionSettings.get(0), 1))
+			.append("\n§5BounceForce | " + colorSetting(regionSettings.get(1), 2))
+			.append("\n§5BounceSound | " + colorSetting(regionSettings.get(2), 3))
+			.append("\n§5BouncePrize | " + colorSetting(regionSettings.get(3), 4))
+			.append("\n§5StopWhenCrouch | " + colorSetting(regionSettings.get(4), 1))
+			.append("\n§5FallDamage | " + colorSetting(regionSettings.get(5), 1))
+			.append("\n§5DeathMessage | " + colorSetting(regionSettings.get(6), 4))
+			.append("\n§5RequirePermission | " + colorSetting(regionSettings.get(7), 1))
+			.append("\n§5BounceBlocks | " + colorSetting(regionSettings.get(8), 3))
+			.append("\n§5IsBlockBlackList | " + colorSetting(regionSettings.get(9), 1))
 			.append(endMSG).create());
 	}
 
@@ -122,7 +121,7 @@ public class Messages implements Listener {
 	public void setupWithoutWorldGuard(Player player) {player.spigot().sendMessage(startMSG()
 		.append("\n" + fC("To go bouncing you first have to edit some settings in the config. After you've done that reload the config by typing '", "d"))
 		.append(fC("/cb ReloadConfig", "5")).event(new ClickEvent(Action.SUGGEST_COMMAND, "/cb ReloadConfig")).append("§d`. ").event((ClickEvent) null)
-		.append(fC("After that you can start right away with bouncing. Have Fun!", "d"))
+		.append(fC("After that you can start bouncing. Have Fun!", "d"))
 		.append(endMSG).create());
 	}
 

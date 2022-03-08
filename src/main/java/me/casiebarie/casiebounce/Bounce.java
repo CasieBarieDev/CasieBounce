@@ -3,8 +3,7 @@ package me.casiebarie.casiebounce;
 import me.casiebarie.casiebounce.database.Database;
 import me.casiebarie.casiebounce.utils.ConfigManager;
 import me.casiebarie.casiebounce.utils.PrizeManager;
-import me.casiebarie.casiebounce.worldguard.WorldGuardManager;
-import net.md_5.bungee.api.ChatColor;
+import me.casiebarie.casiebounce.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -19,32 +18,27 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Bounce implements Listener {
-	final Main plugin;
-	final WorldGuardManager wgM;
-	final ConfigManager cM;
-	final PrizeManager pM;
-	final Database db;
-	final ArrayList<UUID> isBouncing = new ArrayList<>(), canDie = new ArrayList<>();
-	public Bounce(Main plugin, WorldGuardManager wgM, ConfigManager cM, PrizeManager pM) {
-		this.plugin = plugin; this.wgM = wgM; this.cM = cM; this.pM = pM; this.db = plugin.getDatabase();
+	final Main plugin; final Utils utils; final WorldGuardManager wgM; final ConfigManager cM; final PrizeManager pM; final Database db;
+	final ArrayList<Player> isBouncing = new ArrayList<>(), wasBouncing = new ArrayList<>(), canDie = new ArrayList<>();
+	public Bounce(Main plugin, Utils utils, WorldGuardManager wgM, ConfigManager cM, PrizeManager pM) {
+		this.plugin = plugin; this.utils = utils; this.wgM = wgM; this.cM = cM; this.pM = pM; this.db = plugin.getDatabase();
 		Bukkit.getPluginManager().registerEvents(this, plugin); repeat();
 	}
 
 	private void repeat() {
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
 			for(Player player : Bukkit.getOnlinePlayers()) {
-				if(!((Entity) player).isOnGround() && player.getFallDistance() > 0) {isBouncing.remove(player.getUniqueId()); continue;}
-				if(canDie.contains(player.getUniqueId()) || isBouncing.contains(player.getUniqueId())) {continue;}
+				if(!((Entity) player).isOnGround() && player.getFallDistance() > 0) {wasBouncing(player); continue;}
+				if(canDie.contains(player) || isBouncing.contains(player)) {continue;}
 				if(canBounce(player)) {goBounce(player, (plugin.wgEnabled) ? wgM.getRegionName(player) : "Global");}
 			}
 		}, 0, 1L);
 	}
 
 	private void goBounce(Player player, String region) {
-		isBouncing.remove(player.getUniqueId());
+		isBouncing.remove(player);
 		ArrayList<Object> finalSettings;
 		finalSettings = getFinalSettings(player, cM.getConfigSettings());
 		if(finalSettings == null) {return;}
@@ -54,7 +48,7 @@ public class Bounce implements Listener {
 		pM.givePrize(player, finalSettings.get(3).toString());
 		plugin.mBounces += 1;
 		db.addBounces(region, player.getUniqueId(), player.getName(), player.getWorld(), 1);
-		isBouncing.add(player.getUniqueId());
+		isBouncing.add(player);
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
@@ -92,17 +86,23 @@ public class Bounce implements Listener {
 		return finalSettings;
 	}
 
+	private void wasBouncing(Player player) {
+		isBouncing.remove(player);
+		wasBouncing.add(player);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {wasBouncing.remove(player); canDie.remove(player);}, 5L);
+	}
+
 	@EventHandler
 	public void onPlayerDamage(EntityDamageEvent e) {
 		if(!(e.getEntity() instanceof Player) || (e.getCause() != DamageCause.FALL)) {return;}
 		Player player = (Player) e.getEntity();
-		canDie.remove(player.getUniqueId());
-		if(!isBouncing.contains(player.getUniqueId())) {return;}
+		canDie.remove(player);
+		if(!wasBouncing.contains(player)) {return;}
 		ArrayList<Object> finalSettings;
 		finalSettings = getFinalSettings(player, cM.getConfigSettings());
 		if(finalSettings == null) {return;}
 		if(finalSettings.get(5).equals(false)) {e.setCancelled(true);}
-		else {canDie.add(player.getUniqueId());}
+		else {canDie.add(player);}
 	}
 
 	@EventHandler
@@ -111,9 +111,9 @@ public class Bounce implements Listener {
 		ArrayList<Object> finalSettings;
 		finalSettings = getFinalSettings(player, cM.getConfigSettings());
 		if(finalSettings == null) {return;}
-		if(player.getLastDamageCause().getCause() == DamageCause.FALL && canDie.contains(player.getUniqueId()) && !finalSettings.get(6).toString().equals("")) {
+		if(player.getLastDamageCause().getCause() == DamageCause.FALL && canDie.contains(player) && !finalSettings.get(6).toString().equals("")) {
 			String deathMessage = finalSettings.get(6).toString().replaceAll("%player%", player.getDisplayName());
-			e.setDeathMessage(ChatColor.translateAlternateColorCodes('&', deathMessage));
-		} canDie.remove(player.getUniqueId());
+			e.setDeathMessage(utils.hex(deathMessage));
+		} canDie.remove(player);
 	}
 }

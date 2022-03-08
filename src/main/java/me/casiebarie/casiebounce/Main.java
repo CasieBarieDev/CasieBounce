@@ -3,7 +3,6 @@ package me.casiebarie.casiebounce;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.casiebarie.casiebounce.database.*;
 import me.casiebarie.casiebounce.utils.*;
-import me.casiebarie.casiebounce.worldguard.WorldGuardManager;
 import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -27,7 +26,7 @@ public class Main extends JavaPlugin {
 	static WorldGuardPlugin worldGuardPlugin;
 	public static Economy econ;
 	public static Permission perm;
-	public static Checker checker;
+	public static Utils utils;
 	private ConfigManager cM;
 	public static WorldGuardManager wgM;
 	public boolean canBounce, isLegacy, wgEnabled, wgError;
@@ -40,14 +39,14 @@ public class Main extends JavaPlugin {
 		saveDefaultConfig();
 		db = new SQLite(this);
 		db.load();
-		checker = new Checker(this);
+		utils = new Utils(this);
 		wgM = new WorldGuardManager(this);
 		ResetData rD = new ResetData(this);
 		Messages msg = new Messages(this, wgM);
-		cM = new ConfigManager(this, msg, checker);
+		cM = new ConfigManager(this, msg, utils);
 		PrizeManager pM = new PrizeManager(this);
 		new Commands(this, db, cM, msg, rD);
-		new Bounce(this, wgM, cM, pM);
+		new Bounce(this, utils, wgM, cM, pM);
 		if(papiPresent()) {new PapiExpansion(this, db).register();}
 		new UpdateChecker(this, 90967, "CB.admin", ChatColor.YELLOW).checkForUpdate();
 		Metrics metrics = new Metrics(this, 13216);
@@ -68,7 +67,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public void legacyCheck() {
-		final String bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
+		final String bukkitVersion = getServer().getClass().getPackage().getName().replace("org.bukkit.craftbukkit.v","");
 		Main.bukkitVersion = bukkitVersion.replaceFirst("_", ".").split("_")[0];
 		final List<String> legacyVersions = Arrays.asList("1_8_R1", "1_8_R2", "1_8_R3", "1_9_R1", "1_9_R2", "1_10_R1", "1_11_R1", "1_12_R1");
 		final List<String> versions = Arrays.asList("1_13_R1", "1_13_R2", "1_14_R1", "1_15_R1", "1_16_R1", "1_16_R2", "1_16_R3", "1_17_R1", "1_17_R2", "1_18_R1", "1_18_R2");
@@ -78,7 +77,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public WorldGuardPlugin getWorldGuard() {
-		Plugin plugin = this.getServer().getPluginManager().getPlugin("WorldGuard");
+		Plugin plugin = getServer().getPluginManager().getPlugin("WorldGuard");
 		if(!(plugin instanceof WorldGuardPlugin)) {return null;}
 		return (WorldGuardPlugin) plugin;
 	}
@@ -103,7 +102,7 @@ public class Main extends JavaPlugin {
 			if(wgEnabled) {bounceBlocks.addAll(wgM.getAllBounceBlocks());}
 			List<String> configBounceBlocks = (List<String>) cM.getConfigSettings().get(8);
 			for(String blockName : configBounceBlocks) {
-				if(!checker.checkBlock(blockName)) {continue;}
+				if(!utils.checkBlock(blockName)) {continue;}
 				if(!bounceBlocks.contains(blockName.toUpperCase())) {bounceBlocks.add(blockName.toUpperCase());}
 			} for(String bounceBlock : bounceBlocks) {valueMap.put(bounceBlock, 1);} return valueMap;
 		}));

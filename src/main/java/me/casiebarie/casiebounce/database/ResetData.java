@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ResetData implements Listener{
-	final Main plugin;
-	final Database db;
+	final Main plugin; final Database db;
 	private static final Map<String, String> map = new HashMap<>();
 	private void finalMSG(CommandSender sender, String type, String data) {sender.sendMessage("§6[§bCasieBounce§6] §aDeleting " + type.toLowerCase() + "data of §4" + data + "§a!");}
 	private void noDataMSG(CommandSender sender, String type, String error) {sender.sendMessage("§6[§bCasieBounce§6] §cThere is no data of this " + type.toLowerCase() + " in the database! §8" + error);}
@@ -48,8 +47,7 @@ public class ResetData implements Listener{
 			case "PLAYER":
 				uuid = data.split("\\(")[1].replaceAll("\\)", "");
 				available.addAll(db.getCompletions(type, uuid)); break;
-			case "ALL": map.put((c) ? "CONSOLE" : ((Player)sender).getUniqueId().toString(), "ALL-ALL"); return true;
-			default: break;}
+			case "ALL": map.put((c) ? "CONSOLE" : ((Player)sender).getUniqueId().toString(), "ALL-ALL"); return true;}
 		if(available.contains(data)) {map.put((c) ? "CONSOLE" : ((Player)sender).getUniqueId().toString(), type + "_" + data); return true;
 		} else {noDataMSG(sender, type, error); return false;}
 	}
@@ -64,6 +62,6 @@ public class ResetData implements Listener{
 			case "REGION": db.resetData(typeData[0], typeData[1].split(":")[0], null, typeData[1].split(":")[1]); finalMSG(sender, typeData[0], typeData[1]); break;
 			case "PLAYER": db.resetData(typeData[0], null, typeData[1].split("\\(")[1].replaceAll("\\)", ""), null); finalMSG(sender, typeData[0], typeData[1]); break;
 			case "ALL": db.resetData(typeData[0], null, null, null); sender.sendMessage("§6[§bCasieBounce§6] §aDeleting §4ALL §athe data!"); break;
-			default: break;} map.remove((c) ? "CONSOLE" : ((Player)sender).getUniqueId().toString());
+		} map.remove((c) ? "CONSOLE" : ((Player)sender).getUniqueId().toString());
 	}
 }

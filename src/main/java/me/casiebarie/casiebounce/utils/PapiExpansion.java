@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PapiExpansion extends PlaceholderExpansion {
-	final Main plugin;
-	final Database db;
+	final Main plugin; final Database db;
 	public PapiExpansion(Main plugin, Database db) {this.plugin = plugin; this.db = db;}
 	@Override public boolean persist() {return true;}
 	@Override public boolean canRegister() {return true;}

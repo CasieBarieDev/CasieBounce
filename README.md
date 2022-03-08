@@ -4,6 +4,11 @@
 <br/>
 
 ## Patch Notes:
+### [v6.3](https://www.spigotmc.org/resources/.90967/update?update=448216)
+- **Added** | Hex color support in death message.
+- **Fix** | Death message not working.
+- **Fix** | Custom sounds not working correctly.
+
 ### [v6.2](https://www.spigotmc.org/resources/.90967/update?update=447292)
 - **Added** | Able to play custom sounds. Add `CUSTOM:` to the front and specify the sound the same way as in the /playsound command.
 - **Added** | Able to run a command as a prize. The console will not be spammed with the output of plugin commands. Vanilla commands can still spam the console!
@@ -94,7 +99,7 @@
 ### [v4.0](https://www.spigotmc.org/resources/.90967/update?update=411565)
 - **Added** | 1.17 Support
 - **Added** | Falldamage types - You can set the falldamage to 'DISABLED', 'ENABLED' or 'REDUCED'.
-- **Added** | Config checker
+- **Added** | Config utils
     - Disables bouncing when there is a config error.
     - Logs the error in the console.
     - Sends a warning to players with 'CB.admin' when they join.

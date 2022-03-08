@@ -1,4 +1,4 @@
-package me.casiebarie.casiebounce.worldguard;
+package me.casiebarie.casiebounce;
 
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -7,13 +7,14 @@ import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import me.casiebarie.casiebounce.Main;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -28,7 +29,6 @@ public class WorldGuardManager {
 	private static StringFlag CB_DEATHMESSAGE;
 	private static SetFlag<String> CB_BOUNCEBLOCKS, CB_BOUNCEPRIZE, CB_BOUNCESOUND;
 	private static BooleanFlag CB_ENABLED, CB_STOPWHENCROUCH, CB_REQUIREPERMISSION, CB_ISBLOCKBLACKLIST, CB_FALLDAMAGE;
-	private class RequirePermissionFlag extends BooleanFlag {public RequirePermissionFlag(String name) {super(name); registerPerissions();}}
 	public WorldGuardManager(Main plugin) {this.plugin = plugin; l = plugin.isLegacy; worldGuardManager = this;}
 
 	@SuppressWarnings("unchecked")
@@ -153,7 +153,7 @@ public class WorldGuardManager {
 		} catch (NullPointerException ignored) {}
 		regionSettings.add((enabled != null) ? enabled : false);
 		regionSettings.add((bounceForce != null) ? bounceForce : d);
-		regionSettings.add((bounceSound != null) ? bounceSound : d);
+		regionSettings.add((bounceSound != null) ? bounceSound.toString().replaceAll("CUSTOM:", "") : d);
 		regionSettings.add((prize != null) ? prize : d);
 		regionSettings.add((stopWhenCrouch != null) ? stopWhenCrouch : d);
 		regionSettings.add((fallDamage != null) ? fallDamage : d);
@@ -238,5 +238,56 @@ public class WorldGuardManager {
 		for(ProtectedRegion region : set.getRegions()) {
 			if(region.getFlag(CB_ENABLED) != null) {return region.getId();}
 		} return "Global";
+	}
+
+	//FLAG CLASSES
+	private class RequirePermissionFlag extends BooleanFlag {public RequirePermissionFlag(String name) {super(name); registerPerissions();}}
+	private class BounceBlocksFlag extends Flag<String> {
+		public BounceBlocksFlag(String name) {super(name);}
+		@Override public String unmarshal(Object o) {return o.toString();}
+		@Override public Object marshal(String o) {return o;}
+		@Override
+		public String parseInput(FlagContext context) throws InvalidFlagFormat {
+			String input = context.getUserInput();
+			if(input.equals("NONE")) {return input;}
+			if(!Main.utils.checkBlock(input)) {throw new InvalidFlagFormat("Unable to find the material! Please refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids");}
+			Material material;
+			if(input.contains(":")) {material = Material.matchMaterial(input.split(":")[0]);
+			} else {material = Material.matchMaterial(input);}
+			if(!material.isBlock()) {throw new InvalidFlagFormat("This material isn't seen as a 'placable block', use alternative id");}
+			return input;
+		}
+	}
+	private class PrizeFlag extends Flag<String> {
+		public PrizeFlag(String name) {super(name);}
+		@Override
+		public String parseInput(FlagContext context) throws InvalidFlagFormat {
+			String input = context.getUserInput();
+			String f = "Unable to validate Flag! ";
+			switch (Main.utils.checkPrize(input)) {
+			case 0: return input;
+			case 1: throw new InvalidFlagFormat(f + "Please use 'TYPE@VALUE'!");
+			case 2: throw new InvalidFlagFormat(f + "Please use MONEY, ITEM, PERMISSION or COMMAND!");
+			case 3: throw new InvalidFlagFormat(f + "Please use a Double as value!");
+			case 4: throw new InvalidFlagFormat(f + "Material is not recognized! Please refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids");
+			case 5: throw new InvalidFlagFormat(f + "Vault is not enabled!");
+			default: throw new InvalidFlagFormat(f + "I dont know why! (please contact CasieBarie for help)");}
+		}
+		@Override public Object marshal(String o) {return o;}
+		@Override public String unmarshal(Object o) {return o.toString();}
+	}
+	private class SoundFlag extends Flag<String>{
+		protected SoundFlag(String name) {super(name);}
+		@Override
+		public String parseInput(FlagContext context) throws InvalidFlagFormat {
+			String input = context.getUserInput();
+			String f = "Unable to validate Flag! ";
+			switch(Main.utils.checkSound(input)) {
+			case 0: case 2: return input;
+			case 1: throw new InvalidFlagFormat(f + "Invalid sound! Please refer to https://helpch.at/docs/" + Main.bukkitVersion + "/index.html?org/bukkit/Sound.html for valid ids");
+			default: throw new InvalidFlagFormat(f + "I dont know why! (please contact CasieBarie for help)");}
+		}
+		@Override public String unmarshal(@Nullable Object o) {return o.toString();}
+		@Override public Object marshal(String s) {return s;}
 	}
 }

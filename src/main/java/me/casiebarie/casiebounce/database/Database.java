@@ -46,8 +46,7 @@ public abstract class Database {
 					case "TOTAL": bounces.add(rs.getInt(4)); break;
 					case "PLAYER": if(rs.getString(1).split(",")[1].equals(value)) {bounces.add(rs.getInt(4));} break;
 					case "PLAYERREGION": if(rs.getString(1).equals(value) && rs.getString(3).equals(world)) {return rs.getInt(4);}
-					case "TOTALREGION": if(rs.getString(1).split(",")[0].equals(value) && rs.getString(3).equals(world)) {bounces.add(rs.getInt(4));} break;
-					default: break;}
+					case "TOTALREGION": if(rs.getString(1).split(",")[0].equals(value) && rs.getString(3).equals(world)) {bounces.add(rs.getInt(4));} break;}
 			} return bounces.stream().mapToInt(Integer::intValue).sum();
 		} catch (Exception e) {plugin.getLogger().log(Level.SEVERE, sqlConnectionExecute, e);
 		} finally {doFinally(ps, conn);} return 0;
@@ -93,8 +92,7 @@ public abstract class Database {
 				switch (mode) {
 					case "PLAYER": if(!completions.contains(rs.getString(2) + "(" + regionPlayer[1] + ")")) {completions.add(rs.getString(2) + "(" + regionPlayer[1] + ")");} break;
 					case "REGION": if(!completions.contains(regionPlayer[0] + ":" + world)) {completions.add(regionPlayer[0] + ":" + world);} break;
-					case "REGIONPLAYER": if(regionPlayer[0].equals(data.split(":")[0]) && rs.getString(3).equals(data.split(":")[1])) {if(!completions.contains(rs.getString(2) + "(" + regionPlayer[1] + ")")) {completions.add(rs.getString(2) + "(" + regionPlayer[1] + ")");}} break;
-					default: break;}
+					case "REGIONPLAYER": if(regionPlayer[0].equals(data.split(":")[0]) && rs.getString(3).equals(data.split(":")[1])) {if(!completions.contains(rs.getString(2) + "(" + regionPlayer[1] + ")")) {completions.add(rs.getString(2) + "(" + regionPlayer[1] + ")");}} break;}
 			} return completions;
 		} catch (Exception e) {plugin.getLogger().log(Level.SEVERE, sqlConnectionExecute, e);
 		} finally {doFinally(ps, conn);} return null;
@@ -126,8 +124,7 @@ public abstract class Database {
 				case "REGIONPLAYER": ps = conn.prepareStatement("DELETE FROM " + table + " WHERE regionplayer=`" + region + "," + player + "` AND world=`" + world + "';"); break;
 				case "REGION": ps = conn.prepareStatement("DELETE FROM " + table + " WHERE regionplayer LIKE '" + region + ",%' AND world=`" + world + "`;"); break;
 				case "PLAYER": ps = conn.prepareStatement("DELETE FROM " + table + " WHERE regionplayer LIKE '%," + player + "';"); break;
-				case "ALL": ps = conn.prepareStatement("DELETE FROM " + table);
-				default: break;}
+				case "ALL": ps = conn.prepareStatement("DELETE FROM " + table);}
 			ps.executeUpdate();
 		} catch (SQLException e) {plugin.getLogger().log(Level.SEVERE, sqlConnectionExecute, e);
 		} finally {doFinally(ps, conn);}

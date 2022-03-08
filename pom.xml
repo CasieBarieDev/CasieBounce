@@ -4,7 +4,7 @@
     <groupId>me.casiebarie</groupId>
     <artifactId>CasieBounce</artifactId>
     <url>https://www.casiebariedev.ga/</url>
-    <version>6.2</version>
+    <version>6.3</version>
     <properties>
         <project.author>CasieBarie</project.author>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -94,7 +94,7 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>me.casiebarie.casiebounce.utils</shadedPattern>
+                            <shadedPattern>me.casiebarie.casiebounce.utils.bstats</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

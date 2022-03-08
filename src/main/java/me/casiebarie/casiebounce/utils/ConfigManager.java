@@ -10,12 +10,10 @@ import java.util.ArrayList;
 
 public class ConfigManager {
 	private static FileConfiguration config;
-	final Main plugin;
-	final Messages msg;
-	private static Checker checker;
+	final Main plugin; final Messages msg; static Utils utils;
 	private static ArrayList<String> errors;
 	private String defaultError(String setting, Object value, String type) {return "&cThe value '" + value + "' at setting '" + setting + "' cannot be recognized! &8(TYPE: " + type + ")";}
-	public ConfigManager(Main plugin, Messages msg, Checker checker) {this.plugin = plugin; this.msg = msg; ConfigManager.checker = checker; reloadConfig(null);}
+	public ConfigManager(Main plugin, Messages msg, Utils utils) {this.plugin = plugin; this.msg = msg; ConfigManager.utils = utils; reloadConfig(null);}
 	public void checkConfig(CommandSender sender, Boolean isCommand) {
 		errors = new ArrayList<>();
 		for(configSettings setting : configSettings.values()) {
@@ -31,7 +29,7 @@ public class ConfigManager {
 	public ArrayList<Object> getConfigSettings() {
 		ArrayList<Object> configSettingsList = new ArrayList<>();
 		for(configSettings setting : configSettings.values()) {
-			if(setting.equals(configSettings.BounceSound)) {configSettingsList.add(config.get("." + setting.name()).toString().replace("*", ""));}
+			if(setting.equals(configSettings.BounceSound)) {configSettingsList.add(config.get("." + setting.name()).toString().replace("CUSTOM:", ""));}
 			else {configSettingsList.add(config.get("." + setting.name()));}}
 		return configSettingsList;
 	}
@@ -64,13 +62,13 @@ public class ConfigManager {
 			switch (toCheck) {
 			case 1:
 				start = "&cThe value '" + input + "' at setting 'BounceSound' cannot be recognized! ";
-				switch(checker.checkSound(input.toString())) {
+				switch(utils.checkSound(input.toString())) {
 				case 0: case 2: break;
 				case 1: errors.add(start + "&cThe sound `" + input + "` in `BounceSound` is not a valid sound! &8Refer to https://helpch.at/docs/" + Main.bukkitVersion + "/index.html?org/bukkit/Sound.html for valid ids"); break;
 				default: errors.add(start + "I dont know why! (please contact CasieBarie for help)");} break;
 			case 2:
 				start = "&cThe value '" + input + "' at setting 'BouncePrize' cannot be recognized! ";
-				switch (checker.checkPrize(input.toString())) {
+				switch (utils.checkPrize(input.toString())) {
 				case 0: break;
 				case 1: errors.add(start + "Please use 'TYPE@VALUE'!"); break;
 				case 2: errors.add(start + "Please use MONEY, ITEM, PERMISSION or COMMAND!"); break;
@@ -78,8 +76,7 @@ public class ConfigManager {
 				case 4: errors.add(start + "Material is not recognized! &8Please refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids"); break;
 				case 5: errors.add(start + "Vault is not enabled!"); break;
 				default: errors.add(start + "I dont know why! (please contact CasieBarie for help)");} break;
-			case 3: for(String blockName : config.getStringList(".BounceBlocks")) {if(!checker.checkBlock(blockName)) {errors.add("&cThe block `" + blockName + "` in `BounceBlocks` is not a valid block! &8Refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids");}} break;
-			default: break;}
+			case 3: for(String blockName : config.getStringList(".BounceBlocks")) {if(!utils.checkBlock(blockName)) {errors.add("&cThe block `" + blockName + "` in `BounceBlocks` is not a valid block! &8Refer to https://helpch.at/docs/" + Main.bukkitVersion + "/org/bukkit/Material.html for valid ids");}} break;}
 		}
 	}
 }

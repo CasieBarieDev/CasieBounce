@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -22,10 +21,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class UpdateChecker implements Listener {
-	final Main plugin;
-	final Integer recourceID;
-	final String permission;
-	final ChatColor color;
+	final Main plugin; final Integer recourceID; final String permission; final ChatColor color;
 	private static Boolean isNewVersion = false, firstCheck = true;
 	private static String LastSpigotVersion = "NOT_CHECKED", spigotVersion, currVersion;
 	private void send(String msg) {Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', msg));}
@@ -71,7 +67,7 @@ public class UpdateChecker implements Listener {
 		} catch (Exception e) {plugin.getLogger().info("Failed to check for updates: " + e.getMessage());}
 	}
 
-	private void printToConsole(@NotNull List<String> lines) {
+	private void printToConsole(List<String> lines) {
 		int longestLine = 0;
 		for(String line : lines) {longestLine = Math.max(line.length(), longestLine);}
 		longestLine += 4;

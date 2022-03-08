@@ -8,18 +8,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Commands implements CommandExecutor, TabCompleter {
-	final Main plugin;
-	final Database db;
-	final ConfigManager cM;
-	final Messages msg;
-	final ResetData rD;
+	final Main plugin; final Database db; final ConfigManager cM; final Messages msg; final ResetData rD;
 	private enum complete {ReloadConfig, Info, GetErrors, GetRegionSettings, ResetData}
 	private enum resetdata {RegionPlayer, Region, Player, All}
 	public void onlyPlayer(CommandSender sender) {msg.send(sender, "&cThis command can only be executed by a player!");}
@@ -29,7 +24,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 	}
 
 	@Override
-	public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if(cmd.getName().equalsIgnoreCase("CB") && args.length >= 1) {
 			if(sender.hasPermission("CB.admin")) {
 				switch (args[0].toUpperCase()) {
@@ -67,7 +62,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 	}
 
 	@Override
-	public List<String> onTabComplete(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
 		List<String> completions = new ArrayList<>();
 		if(cmd.getName().equalsIgnoreCase("CB") && sender.hasPermission("CB.admin")) {
 			if(args.length == 1) {
@@ -89,8 +84,7 @@ public class Commands implements CommandExecutor, TabCompleter {
 				switch (args[1].toUpperCase()) {
 					case "REGIONPLAYER":
 					case "REGION": dataBase.addAll(db.getCompletions("REGION", null)); break;
-					case "PLAYER": dataBase.addAll(db.getCompletions("PLAYER", null)); break;
-					default: break;}
+					case "PLAYER": dataBase.addAll(db.getCompletions("PLAYER", null)); break;}
 				if(!args[2].equals("")) {for(String data : dataBase) {if(data.toUpperCase().startsWith(args[2].toUpperCase())) {completions.add(data);}}
 				} else {completions.addAll(dataBase);}
 			} else if(args.length == 4) {
